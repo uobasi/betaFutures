@@ -2353,7 +2353,7 @@ from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 1000000  # Initial interval #210000#250000#80001
 subsequent_inter = 80000  # Subsequent interval
 app = Dash()
-app.title = "Envisage"
+app.title = "EnVisage"
 app.layout = html.Div([
     
     dcc.Graph(id='graph', config={'modeBarButtonsToAdd': ['drawline']}),
