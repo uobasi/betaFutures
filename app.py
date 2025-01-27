@@ -1724,16 +1724,16 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     stillsell = False
 
     if df['buy_signal'][0]:
-    stillbuy = True
-    fig.add_annotation(x=df['time'][0], y=df['close'][0],
-                       text='<b>' + 'Buy' + '</b>',
-                       showarrow=True,
-                       arrowhead=4,
-                       arrowcolor='green',
-                       font=dict(
-                           size=10,
-                           color='green',
-                       ),)
+        stillbuy = True
+        fig.add_annotation(x=df['time'][0], y=df['close'][0],
+                        text='<b>' + 'Buy' + '</b>',
+                        showarrow=True,
+                        arrowhead=4,
+                        arrowcolor='green',
+                        font=dict(
+                            size=10,
+                            color='green',
+                        ),)
 
     if df['sell_signal'][0]:
         stillsell = True
