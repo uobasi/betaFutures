@@ -1722,40 +1722,64 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     '''
     stillbuy = False
     stillsell = False
-    for p in range(1, len(df)):  # Start from 1 to compare with the previous row
-        if 'buy_signal' in df.columns:
-            # Check if the value of cross_above changed from the previous row
-            if df['buy_signal'][p] != df['buy_signal'][p-1] and not stillbuy :
-                # Add 'Buy' only if cross_above is True after the change
-                stillbuy = True
-                stillsell = False
-                if df['buy_signal'][p]:
-                   fig.add_annotation(x=df['time'][p], y=df['close'][p],
-                                      text='<b>' + 'Buy' + '</b>',
-                                      showarrow=True,
-                                      arrowhead=4,
-                                      arrowcolor='green',
-                                      font=dict(
-                                          size=10,
-                                          color='green',
-                                      ),)
+
+    if df['buy_signal'][0]:
+    stillbuy = True
+    fig.add_annotation(x=df['time'][0], y=df['close'][0],
+                       text='<b>' + 'Buy' + '</b>',
+                       showarrow=True,
+                       arrowhead=4,
+                       arrowcolor='green',
+                       font=dict(
+                           size=10,
+                           color='green',
+                       ),)
+
+    if df['sell_signal'][0]:
+        stillsell = True
+        fig.add_annotation(x=df['time'][0], y=df['close'][0],
+                        text='<b>' + 'Sell' + '</b>',
+                        showarrow=True,
+                        arrowhead=4,
+                        arrowcolor='red',
+                        font=dict(
+                            size=10,
+                            color='red',
+                        ),)
         
-        if 'sell_signal' in df.columns:
-            # Check if the value of cross_below changed from the previous row
-            if df['sell_signal'][p] != df['sell_signal'][p-1] and not stillsell :
-                # Add 'Sell' only if cross_below is True after the change
-                stillsell = True
-                stillbuy = False
-                if df['sell_signal'][p]:
-                    fig.add_annotation(x=df['time'][p], y=df['close'][p],
-                                       text='<b>' + 'Sell' + '</b>',
-                                       showarrow=True,
-                                       arrowhead=4,
-                                       arrowcolor='red',
-                                       font=dict(
-                                           size=10,
-                                           color='red'
-                                       ),)
+
+    for p in range(1, len(df)):  # Start from 1 to compare with the previous row
+        # Check if the value of cross_above changed from the previous row
+        if df['buy_signal'][p] != df['buy_signal'][p-1] and not stillbuy :
+            # Add 'Buy' only if cross_above is True after the change
+            stillbuy = True
+            stillsell = False
+            if df['buy_signal'][p]:
+                fig.add_annotation(x=df['time'][p], y=df['close'][p],
+                                    text='<b>' + 'Buy' + '</b>',
+                                    showarrow=True,
+                                    arrowhead=4,
+                                    arrowcolor='green',
+                                    font=dict(
+                                        size=10,
+                                        color='green',
+                                    ),)
+        
+        # Check if the value of cross_below changed from the previous row
+        if df['sell_signal'][p] != df['sell_signal'][p-1] and not stillsell :
+            # Add 'Sell' only if cross_below is True after the change
+            stillsell = True
+            stillbuy = False
+            if df['sell_signal'][p]:
+                fig.add_annotation(x=df['time'][p], y=df['close'][p],
+                                    text='<b>' + 'Sell' + '</b>',
+                                    showarrow=True,
+                                    arrowhead=4,
+                                    arrowcolor='red',
+                                    font=dict(
+                                        size=10,
+                                        color='red'
+                                    ),)
     
     
     '''
