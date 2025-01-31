@@ -2319,7 +2319,17 @@ def calculate_polyfit_slope_weighted(index, values, window_size):
     except np.linalg.LinAlgError:
         return 0.0
 
+def vwapDistanceCheckBuy(df):
+    if abs(df['vwapDistance']) <= 0.06:
+        return df['smoothed_1ema'] > df['vwap']
+    return True
 
+def vwapDistanceCheckSell(df):
+    if abs(df['vwapDistance']) <= 0.06:
+        return df['smoothed_1ema'] < df['vwap']
+    return True
+
+    
 symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
 symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
 
@@ -3050,6 +3060,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['smoothed_1ema'] = apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
         df['POCDistance'] = (df['smoothed_1ema'] - df['POC']) / df['POC'] * 100
         df['POCDistanceEMA'] = df['POCDistance']#((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
+        df['vwapDistance'] = (df['smoothed_1ema'] - df['vwap']) / df['vwap'] * 100
         #df['POCDistanceEMA'] = df['POCDistanceEMA'].ewm(span=2, adjust=False).mean()#gaussian_filter1d(df['POCDistanceEMA'], sigma=int(1))##
         #df['POCDistanceEMA'] = exponential_median(df['POCDistanceEMA'].values, span=2)
         
@@ -3134,10 +3145,14 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #& (df['POCDistanceEMA'] > df['positive_meanEma']) & (df['smoothed_derivative'] > 0)
         #(df['POCDistanceEMA'] < df['negative_meanEma']) & (df['smoothed_derivative'] < 0)  &
         
-        df['cross_above'] = (df['smoothed_1ema'] >= df['POC'])  & (df['POCDistanceEMA'] > 0.037) & (df['smoothed_derivative'] > 0)&  ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0)) #0.03 0.0183& (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+                
+        df['vwap_signalBuy'] = df.apply(vwapDistanceCheckBuy, axis=1)
+        df['vwap_signalSell'] = df.apply(vwapDistanceCheckSell, axis=1)
+        
+        df['cross_above'] = (df['smoothed_1ema'] >= df['POC']) & (df['POCDistanceEMA'] > 0.037) & (df['smoothed_derivative'] > 0)& ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0)) & (df['vwap_signalBuy'])#0.03 0.0183& (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
 
         # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
-        df['cross_below'] = (df['smoothed_1ema'] <= df['POC'])  & (df['POCDistanceEMA'] < -0.037) & (df['smoothed_derivative'] < 0)&  ((df['polyfit_slope'] < 0) | (df['slope_degrees'] < 0)) #-0.03 -0.0183& (df['smoothed_derivative'] < 0) & (df['POCDistanceEMA'] < -0.01)#&  (df['momentum'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+        df['cross_below'] = (df['smoothed_1ema'] <= df['POC'])  & (df['POCDistanceEMA'] < -0.037) & (df['smoothed_derivative'] < 0)&  ((df['polyfit_slope'] < 0) | (df['slope_degrees'] < 0)) & (df['vwap_signalSell']) #-0.03 -0.0183& (df['smoothed_derivative'] < 0) & (df['POCDistanceEMA'] < -0.01)#&  (df['momentum'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
 
         df['buy_signal'] = (df['cross_above']) #& (df['smoothed_1ema'] >= df['positive_threshold'])# & (df['smoothed_derivative'] > df['positive_mean']) & (df['POCDistanceEMA'] > df['positive_meanEma'])# & (df['POCDistanceEMA'] > df['positive_percentile'])# & (df['rolling_imbalance'] > 0)#& (df['rolling_imbalance'] > 0) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
         df['sell_signal'] = (df['cross_below']) #& (df['smoothed_1ema'] <= df['negative_threshold'])# & (df['smoothed_derivative'] < df['negative_mean']) & (df['POCDistanceEMA'] < df['positive_meanEma'])# & (df['POCDistanceEMA'] < df['negative_percentile'])# & (df['rolling_imbalance'] < 0)#& (df['rolling_imbalance'] < 0) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
