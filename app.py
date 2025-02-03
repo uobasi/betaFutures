@@ -2391,8 +2391,8 @@ styles = {
 from google.api_core.exceptions import NotFound
 from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
-initial_inter = 1000000  # Initial interval #210000#250000#80001
-subsequent_inter = 80000  # Subsequent interval
+initial_inter = 1500000  # Initial interval #210000#250000#80001
+subsequent_inter = 90000  # Subsequent interval
 app = Dash()
 app.title = "EnVisage"
 app.layout = html.Div([
@@ -3054,8 +3054,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #df['upper_buffer'] = df['POC'] * (1 + buffer)
         #df['lower_buffer'] = df['POC'] * (1 - buffer)
         
-        df['positive_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
-        df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
+        #df['positive_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
+        #df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
         
         df['smoothed_1ema'] = apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
         df['POCDistance'] = (df['smoothed_1ema'] - df['POC']) / df['POC'] * 100
@@ -3064,18 +3064,18 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #df['POCDistanceEMA'] = df['POCDistanceEMA'].ewm(span=2, adjust=False).mean()#gaussian_filter1d(df['POCDistanceEMA'], sigma=int(1))##
         #df['POCDistanceEMA'] = exponential_median(df['POCDistanceEMA'].values, span=2)
         
-        df['positive_meanEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
-        df['negative_meanEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
+        #df['positive_meanEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
+        #df['negative_meanEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
         
-        df['positive_medianEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: np.median(x[x > 0]), raw=False)
-        df['negative_medianEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: np.median(x[x < 0]), raw=False)
+        #df['positive_medianEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: np.median(x[x > 0]), raw=False)
+        #df['negative_medianEma'] = df['POCDistanceEMA'].expanding().apply(lambda x: np.median(x[x < 0]), raw=False)
         
-        positive_values = df['POCDistanceEMA'].apply(lambda x: x if x > 0 else None)
-        negative_values = df['POCDistanceEMA'].apply(lambda x: x if x < 0 else None)
+        #positive_values = df['POCDistanceEMA'].apply(lambda x: x if x > 0 else None)
+        #negative_values = df['POCDistanceEMA'].apply(lambda x: x if x < 0 else None)
         
         # Calculate EMA separately for positive and negative values
-        df['positive_emaEmaRoll'] = positive_values.ewm(span=30, adjust=False).mean()
-        df['negative_emaEmaRoll'] = negative_values.ewm(span=30, adjust=False).mean()
+        #df['positive_emaEmaRoll'] = positive_values.ewm(span=30, adjust=False).mean()
+        #df['negative_emaEmaRoll'] = negative_values.ewm(span=30, adjust=False).mean()
         '''
         df['rolling_std'] = df['close'].rolling(window=150, min_periods=1).std()
         df['rollingPositive_std'] = positive_values.std()
@@ -3134,9 +3134,9 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
         slope = str(df['slope_degrees'].iloc[-1]) + ' ' + str(df['polyfit_slope'].iloc[-1])
         
-        df['atr'] = compute_atr(df) #period=int(clustNum)
-        df['positive_threshold'] = df['POC'] + 1.2 * df['atr']
-        df['negative_threshold'] = df['POC'] - 1.2 * df['atr']
+        #df['atr'] = compute_atr(df) #period=int(clustNum)
+        #df['positive_threshold'] = df['POC'] + 1.2 * df['atr']
+        #df['negative_threshold'] = df['POC'] - 1.2 * df['atr']
         
         
         #df['atr_multiplier'] = 1.3 + (df['atr'] / df['atr'].mean()) * 0.5
