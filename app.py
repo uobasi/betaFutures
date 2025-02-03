@@ -2501,7 +2501,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     clustNum = '20'
         
-    tpoNum = '100'
+    tpoNum = '500'
 
     curvature = '0.6'
     
