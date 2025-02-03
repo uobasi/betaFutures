@@ -2865,7 +2865,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             hstp = historV1(df[:startIndex+it],int(tpoNum),{}, tempList, [])
             vA = valueAreaV3(hstp[0])
             valist.append(vA  + [df['timestamp'][startIndex+it], df['time'][startIndex+it], hstp[2]])
-            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(tpoNum)]
+            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(100)]#tpoNum
             
             timestamp_s = make[it][0] / 1_000_000_000
             new_timestamp_s = timestamp_s + (int(interv)*60)
@@ -2949,7 +2949,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             vA = valueAreaV3(temphs[0])
             valist.append(vA  + [df['timestamp'][it], df['time'][it], temphs[2]])
             
-            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(tpoNum)]
+            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(100)]#tpoNum
             timestamp_s = make[it][0] / 1_000_000_000
             new_timestamp_s = timestamp_s + (int(interv)*60)
             new_timestamp_ns = int(new_timestamp_s * 1_000_000_000)
@@ -3178,7 +3178,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     
     
-    fg = plotChart(df, [hs[1],newwT[:int(tpoNum)]], va[0], va[1], x_fake, df_dx, mboString=mboString,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, mboString=mboString,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
  
     return stored_data, fg, previous_stkName, previous_interv, interval_time
 
