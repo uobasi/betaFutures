@@ -1768,7 +1768,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     arrowhead=4,
                                     arrowcolor='green',
                                     font=dict(
-                                        size=12,
+                                        size=15,
                                         color='green',
                                     ),)
         
@@ -1784,7 +1784,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     arrowhead=4,
                                     arrowcolor='red',
                                     font=dict(
-                                        size=12,
+                                        size=15,
                                         color='red'
                                     ),)
     
