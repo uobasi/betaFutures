@@ -2810,7 +2810,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     
     
     #tempTrades = [i for i in AllTrades]
-    tempTrades = sorted(AllTrades, key=lambda d: d[6], reverse=False) 
+    #tempTrades = sorted(AllTrades, key=lambda d: d[6], reverse=False) 
     #tradeTimes = [i[6] for i in AllTrades]
     tradeEpoch = [i[2] for i in AllTrades]
     
