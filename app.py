@@ -597,7 +597,22 @@ def find_clusters(numbers, threshold):
     return clusters
 
 
-def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = '',   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterNum:int=5, troInterval:list=[]):
+def find_spikes(data, high_percentile=97, low_percentile=3):
+    # Compute the high and low thresholds
+    high_threshold = np.percentile(data, high_percentile)
+    low_threshold = np.percentile(data, low_percentile)
+    
+    # Find and collect spikes
+    spikes = {'high_spikes': [], 'low_spikes': []}
+    for index, value in enumerate(data):
+        if value > high_threshold:
+            spikes['high_spikes'].append((index, value))
+        elif value < low_threshold:
+            spikes['low_spikes'].append((index, value))
+    
+    return spikes
+
+def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:list=[],   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterNum:int=5, troInterval:list=[]):
   
     notround = np.average(df_dx)
     average = round(np.average(df_dx), 3)
@@ -623,7 +638,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     ratio = str(round(max(tosells,tobuys)/min(tosells,tobuys),3))
     # Ratio : '+str(ratio)+' ' 
-    tpString = ' (Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+') | '+ '(Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+'))'+ mboString
+    tpString = ' (Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+') | '+ '(Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+'))'
     
     '''
     putDec = 0
@@ -828,7 +843,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     
     
     #if 'POC' in df.columns:
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.80, name='POC',marker_color='#0000FF'))
@@ -913,14 +928,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         OptionTimeFrame[i[7]][10].append(i)
         
 
-    putCand = [i for i in OptionTimeFrame if int(i[2]) > int(i[3]) if int(i[4]) < len(df)] # if int(i[4]) < len(df)
-    callCand = [i for i in OptionTimeFrame if int(i[3]) > int(i[2]) if int(i[4]) < len(df)] # if int(i[4]) < len(df) +i[3]+i[5] +i[2]+i[5]
-    MidCand = [i for i in OptionTimeFrame if int(i[3]) == int(i[2]) if int(i[4]) < len(df)]
     
+    '''
     tpCandle =  sorted([i for i in OptionTimeFrame if len(i[10]) > 0 if int(i[4]) < len(df)], key=lambda x: sum([trt[1] for trt in x[10]]),reverse=True)[:8] 
 
     
-    '''
+    
     est_now = datetime.utcnow() + timedelta(hours=-4)
     start_time = est_now.replace(hour=8, minute=00, second=0, microsecond=0)
     end_time = est_now.replace(hour=17, minute=30, second=0, microsecond=0)
@@ -929,39 +942,24 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     if start_time <= est_now <= end_time:
         ccheck = 0.64
     else:
-    '''
+    
     ccheck = 0.64
     indsAbove = [i for i in OptionTimeFrame if round(i[6],2) >= ccheck and int(i[4]) < len(df) and float(i[2]) >= (sum([i[2]+i[3] for i in OptionTimeFrame]) / len(OptionTimeFrame))]#  float(bms[i[4]])  # and int(i[4]) < len(df) [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(int(i[10]),i[1]) for i in sord if i[11] == stockName and i[1] == 'AboveAsk(BUY)']]
     
     indsBelow = [i for i in OptionTimeFrame if round(i[7],2) >= ccheck and int(i[4]) < len(df) and float(i[3]) >= (sum([i[3]+i[2] for i in OptionTimeFrame]) / len(OptionTimeFrame))]#  float(sms[i[4]]) # and int(i[4]) < len(df) imbalance = [(len(df)-1,i[1]) if i[0] >= len(df) else i for i in [(i[10],i[1]) for i in sord if i[11] == stockName and i[13] == 'Imbalance' and i[1] != 'BelowBid(SELL)' and i[1] != 'AboveAsk(BUY)']]
-
     
-        
 
-    '''
-    for i in OptionTimeFrame:
-        tvy = ''
-        for xp in i[10]:
-            mks = ''
-            for vb in i[10][xp]:
-                mks+= str(vb)+' '
-            
-            tvy += str(xp) +' | ' + mks + '<br>' 
-        i.append(tvy)
-        #i.append('\n'.join([f'{key}: {value}\n' for key, value in i[10].items()]))
-    '''
-    #print(OptionTimeFrame[0])
     for i in OptionTimeFrame:
         mks = ''
         tobuyss =  sum([x[1] for x in [t for t in i[10] if t[3] == 'B']])
         tosellss = sum([x[1] for x in [t for t in i[10] if t[3] == 'A']])
-        lenbuys = len([t for t in i[10] if t[3] == 'B'])
-        lensells = len([t for t in i[10] if t[3] == 'A'])
-        
+        #lenbuys = len([t for t in i[10] if t[3] == 'B'])
+        #lensells = len([t for t in i[10] if t[3] == 'A'])
         try:
-            tpStrings = '(Sell:' + str(tosellss) + '('+str(round(tosellss/(tobuyss+tosellss),2))+') | '+ '(Buy:' + str(tobuyss) + '('+str(round(tobuyss/(tobuyss+tosellss),2))+')) ' + str(lenbuys+lensells) +' '+  str(tobuyss+tosellss)+'<br>' 
+            tpStrings = '(Sell:' + str(tosellss) + '('+str(round(tosellss/(tobuyss+tosellss),2))+') | '+ '(Buy:' + str(tobuyss) + '('+str(round(tobuyss/(tobuyss+tosellss),2))+')) ' + str(tobuyss-tosellss)+'<br>' #str(lenbuys+lensells) +
         except(ZeroDivisionError):
             tpStrings =' '
+        
         
         for xp in i[10]:#sorted(i[10], key=lambda x: x[0], reverse=True):
             try:
@@ -994,8 +992,36 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
         except(ZeroDivisionError):
             troBelow.append(tro+[troSells, troBuys, 0])
     
-         
+    '''     
+    #textPerCandle = []
+    ctn = 0
+    for i in troPerCandle:
+        mks = ''
+        tobuyss =  sum([x[1] for x in [t for t in i[1] if t[5] == 'B']])
+        tosellss = sum([x[1] for x in [t for t in i[1] if t[5] == 'A']])
 
+        try:
+            tpStrings = '(Sell:' + str(tosellss) + '('+str(round(tosellss/(tobuyss+tosellss),2))+') | '+ '(Buy:' + str(tobuyss) + '('+str(round(tobuyss/(tobuyss+tosellss),2))+')) '+'<br>' +'Top100OrdersPerCandle: '+ str(tobuyss-tosellss)+'<br>' #str(lenbuys+lensells) +
+        except(ZeroDivisionError):
+            tpStrings =' '
+        
+        
+        for xp in i[1][:20]:
+            #print(xp)
+            try:
+                taag = 'Buy' if xp[5] == 'B' else 'Sell' if xp[5] == 'A' else 'Mid'
+                mks += str(xp[0]) + ' | ' + str(xp[1]) + ' ' + taag + ' ' + xp[6] + '<br>' 
+            except(IndexError):
+                pass
+        
+        OptionTimeFrame[ctn].append(mks + tpStrings)
+        #textPerCandle.append([ctn,mks + tpStrings])
+        ctn+=1
+        
+    putCand = [i for i in OptionTimeFrame if int(i[2]) > int(i[3]) if int(i[4]) < len(df)] # if int(i[4]) < len(df)
+    callCand = [i for i in OptionTimeFrame if int(i[3]) > int(i[2]) if int(i[4]) < len(df)] # if int(i[4]) < len(df) +i[3]+i[5] +i[2]+i[5]
+    MidCand = [i for i in OptionTimeFrame if int(i[3]) == int(i[2]) if int(i[4]) < len(df)]
+    
     
     if len(MidCand) > 0:
        fig.add_trace(go.Candlestick(
@@ -1006,7 +1032,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
            close=[df['close'][i[4]] for i in MidCand],
            increasing={'line': {'color': 'gray'}},
            decreasing={'line': {'color': 'gray'}},
-           hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' +  '<br>' +i[11]+ str(i[2]-i[3])   for i in MidCand], #+ i[11] + str(sum([i[10][x][2] for x in i[10]]))
+           hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' +  '<br>' +i[11]+ 'AllOrders: '+str(i[2]-i[3])   for i in MidCand], #+ i[11] + str(sum([i[10][x][2] for x in i[10]]))
            hoverlabel=dict(
                 bgcolor="gray",
                 font=dict(color="black", size=10),
@@ -1024,7 +1050,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             close=[df['close'][i[4]] for i in putCand],
             increasing={'line': {'color': 'teal'}},
             decreasing={'line': {'color': 'teal'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' +i[11]+ str(i[2]-i[3]) for i in putCand], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' +i[11]+ 'AllOrders: '+str(i[2]-i[3]) for i in putCand], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
             hoverlabel=dict(
                  bgcolor="teal",
                  font=dict(color="white", size=10),
@@ -1042,7 +1068,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             close=[df['close'][i[4]] for i in callCand],
             increasing={'line': {'color': 'pink'}},
             decreasing={'line': {'color': 'pink'}},
-            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' +i[11]+ str(i[2]-i[3]) for i in callCand], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
+            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' +i[11]+ 'AllOrders: '+str(i[2]-i[3]) for i in callCand], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
             hoverlabel=dict(
                  bgcolor="pink",
                  font=dict(color="black", size=10),
@@ -1050,7 +1076,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             name='' ),
         row=1, col=1)
         trcount+=1
-  
+    '''
     if len(indsAbove) > 0:
         fig.add_trace(go.Candlestick(
             x=[df['time'][i[4]] for i in indsAbove],
@@ -1105,7 +1131,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
             name='TRO' ),
         row=1, col=1)
         trcount+=1
-        
+     
+    
     if len(troAbove) > 0:
         fig.add_trace(go.Candlestick(
             x=[df['time'][i[4]] for i in troAbove],
@@ -1140,6 +1167,43 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                  font=dict(color="white", size=10),
                  ),
             name='TroSellimbalance' ),
+        row=1, col=1)
+        trcount+=1
+    '''
+    tmpdict = find_spikes(df['weights'])
+    if len(tmpdict['low_spikes']) > 0:
+        fig.add_trace(go.Candlestick(
+            x=[df['time'][i[0]] for i in tmpdict['low_spikes']],
+            open=[df['open'][i[0]] for i in tmpdict['low_spikes']],
+            high=[df['high'][i[0]] for i in tmpdict['low_spikes']],
+            low=[df['low'][i[0]] for i in tmpdict['low_spikes']],
+            close=[df['close'][i[0]] for i in tmpdict['low_spikes']],
+            increasing={'line': {'color': 'crimson'}},
+            decreasing={'line': {'color': 'crimson'}}, 
+            hovertext=['('+str(OptionTimeFrame[i[0]][2])+')'+str(round(OptionTimeFrame[i[0]][6],2))+' '+str('Bid')+' '+'('+str(OptionTimeFrame[i[0]][3])+')'+str(round(OptionTimeFrame[i[0]][7],2))+' Ask' + '<br>' +str(OptionTimeFrame[i[0]][11])+ 'AllOrders: '+ str(OptionTimeFrame[i[0]][2]-OptionTimeFrame[i[0]][3]) for i in tmpdict['low_spikes']],
+            hoverlabel=dict(
+                 bgcolor="crimson",
+                 font=dict(color="white", size=10),
+                 ),
+            name='Sellimbalance' ),
+        row=1, col=1)
+        trcount+=1
+        
+    if len(tmpdict['high_spikes']) > 0:
+        fig.add_trace(go.Candlestick(
+            x=[df['time'][i[0]] for i in tmpdict['high_spikes']],
+            open=[df['open'][i[0]] for i in tmpdict['high_spikes']],
+            high=[df['high'][i[0]] for i in tmpdict['high_spikes']],
+            low=[df['low'][i[0]] for i in tmpdict['high_spikes']],
+            close=[df['close'][i[0]] for i in tmpdict['high_spikes']],
+            increasing={'line': {'color': '#16FF32'}},
+            decreasing={'line': {'color': '#16FF32'}},
+            hovertext=['('+str(OptionTimeFrame[i[0]][2])+')'+str(round(OptionTimeFrame[i[0]][6],2))+' '+str('Bid')+' '+'('+str(OptionTimeFrame[i[0]][3])+')'+str(round(OptionTimeFrame[i[0]][7],2))+' Ask' + '<br>' +str(OptionTimeFrame[i[0]][11])+ 'AllOrders: '+ str(OptionTimeFrame[i[0]][2]-OptionTimeFrame[i[0]][3]) for i in tmpdict['high_spikes']], 
+            hoverlabel=dict(
+                 bgcolor="#2CA02C",
+                 font=dict(color="white", size=10),
+                 ),
+            name='BuyImbalance' ),
         row=1, col=1)
         trcount+=1
     
@@ -1768,7 +1832,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     arrowhead=4,
                                     arrowcolor='green',
                                     font=dict(
-                                        size=15,
+                                        size=12,
                                         color='green',
                                     ),)
         
@@ -1784,7 +1848,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
                                     arrowhead=4,
                                     arrowcolor='red',
                                     font=dict(
-                                        size=15,
+                                        size=12,
                                         color='red'
                                     ),)
     
@@ -1842,20 +1906,6 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', mboString = ''
     return fig
 
 
-def find_spikes(data, high_percentile=97, low_percentile=3):
-    # Compute the high and low thresholds
-    high_threshold = np.percentile(data, high_percentile)
-    low_threshold = np.percentile(data, low_percentile)
-    
-    # Find and collect spikes
-    spikes = {'high_spikes': [], 'low_spikes': []}
-    for index, value in enumerate(data):
-        if value > high_threshold:
-            spikes['high_spikes'].append((index, value))
-        elif value < low_threshold:
-            spikes['low_spikes'].append((index, value))
-    
-    return spikes
 
 def calculate_bollinger_bands(df):
    df['20sma'] = df['close'].rolling(window=20).mean()
@@ -2329,7 +2379,48 @@ def vwapDistanceCheckSell(df):
         return df['smoothed_1ema'] < df['vwap']
     return True
 
+def double_exponential_smoothing(X, alpha, beta):
+    """
+    Applies double exponential smoothing (Holt's linear trend method) to a pandas Series.
+
+    Parameters:
+    - X (pandas.Series or pandas.DataFrame column): Time series data.
+    - alpha (float): Smoothing factor for the level (0 < alpha < 1).
+    - beta (float): Smoothing factor for the trend (0 < beta < 1).
+
+    Returns:
+    - numpy.ndarray: Smoothed series forecast.
+    """
+    # If X is a DataFrame column (Series), convert it to a NumPy array
+    if isinstance(X, (pd.Series, pd.DataFrame)):
+        # If X is a DataFrame, assume the first column is the time series data.
+        X = X.iloc[:, 0] if isinstance(X, pd.DataFrame) else X
+        X = X.values
+
+    # Ensure X is now a NumPy array
+    X = np.asarray(X)
     
+    # Check that X has at least 2 data points
+    if X.shape[0] < 2:
+        raise ValueError("Input series X must contain at least two elements.")
+    
+    # Initialize arrays for the smoothed values (S), level (A), and trend (B)
+    S, A, B = [np.zeros(len(X)) for _ in range(3)]
+    
+    # Initial values: set initial level as the first observation,
+    # and initial trend as the difference between the first two observations.
+    S[0] = X[0]
+    A[0] = X[0]
+    B[0] = X[1] - X[0]
+    
+    # Main loop: update the level, trend, and forecast for each time step.
+    for t in range(1, len(X)):
+        A[t] = alpha * X[t] + (1 - alpha) * S[t - 1]
+        B[t] = beta * (A[t] - A[t - 1]) + (1 - beta) * B[t - 1]
+        S[t] = A[t] + B[t]
+    
+    return S
+   
 symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
 symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
 
@@ -2824,12 +2915,15 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
             make.append([dtimeEpoch[ttm],dtime[ttm],bisect.bisect_left(tradeEpoch, dtimeEpoch[ttm])])
             timeDict[dtime[ttm]] = [0,0,0]
-            
+        
+        troPerCandle = []
         for tr in range(len(make)):
             if tr+1 < len(make):
                 tempList = AllTrades[make[tr][2]:make[tr+1][2]]
             else:
                 tempList = AllTrades[make[tr][2]:len(AllTrades)]
+                
+            troPerCandle.append([make[tr][1],sorted(tempList, key=lambda d: d[1], reverse=True)[:int(100)]])
             for i in tempList:
                 if i[5] == 'B':
                     timeDict[make[tr][1]][0] += i[1]
@@ -2853,6 +2947,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             
             
         stored_data['timeFrame'] = stored_data['timeFrame'][:len(stored_data['timeFrame'])-1] + timeFrame
+        stored_data['troPerCandle'] = stored_data['troPerCandle'][:len(stored_data['troPerCandle'])-1] + troPerCandle
         
         bful = []
         valist = []
@@ -2906,14 +3001,16 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
             timeDict[dtime[ttm]] = [0,0,0]
             
             
-        
+        troPerCandle = []
         for tr in range(len(make)):
             if tr+1 < len(make):
+                #print(make[tr][2],make[tr+1][2])
                 tempList = AllTrades[make[tr][2]:make[tr+1][2]]
             else:
                 tempList = AllTrades[make[tr][2]:len(AllTrades)]
             
             #secList = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(tpoNum)]
+            troPerCandle.append([make[tr][1],sorted(tempList, key=lambda d: d[1], reverse=True)[:int(100)]])
             for i in tempList:
                 if i[5] == 'B':
                     timeDict[make[tr][1]][0] += i[1]
@@ -2968,7 +3065,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
         dst = [[bful[row][0], bful[row][1], bolist[row], bful[row][2], solist[row], bful[row][3], bful[row][4]] for row in  range(len(bful))]
             
-        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist} 
+        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist, 'troPerCandle':troPerCandle} 
         
     
     
@@ -3026,6 +3123,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['HighVA'] = pd.Series([i[1] for i in stored_data['pdata']])
         df['POC'] = pd.Series([i[2] for i in stored_data['pdata']])
         df['POC2'] = pd.Series([i[5] for i in stored_data['pdata']])
+        df['weights'] = [i[2]-i[3] for i in stored_data['timeFrame']]
         '''
         blob = Blob('POCData'+str(symbolNum), bucket) 
         POCData = blob.download_as_text()
@@ -3057,7 +3155,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #df['positive_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
         #df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
         
-        df['smoothed_1ema'] = apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
+        df['smoothed_1ema'] = double_exponential_smoothing(df['1ema'], 0.5, 0.01)#apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
         df['POCDistance'] = (df['smoothed_1ema'] - df['POC']) / df['POC'] * 100
         df['POCDistanceEMA'] = df['POCDistance']#((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
         df['vwapDistance'] = (df['smoothed_1ema'] - df['vwap']) / df['vwap'] * 100
@@ -3149,23 +3247,144 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['vwap_signalBuy'] = df.apply(vwapDistanceCheckBuy, axis=1)
         df['vwap_signalSell'] = df.apply(vwapDistanceCheckSell, axis=1)
         
-        df['cross_above'] = (df['smoothed_1ema'] >= df['POC']) & (df['POCDistanceEMA'] > 0.048) & (df['smoothed_derivative'] > 0)& ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0)) & (df['vwap_signalBuy'])#0.03 0.0183& (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
-
+        #df['buy_signal'] = (df['POCDistanceEMA'].abs() <= 0.021) & (df['smoothed_derivative'] > 0) & ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0))#(df['smoothed_1ema'] >= df['POC']) & (df['POCDistanceEMA'] > 0.048) & (df['smoothed_derivative'] > 0)& ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0)) & (df['vwap_signalBuy'])#0.03 0.0183& (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
+        
         # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
-        df['cross_below'] = (df['smoothed_1ema'] <= df['POC'])  & (df['POCDistanceEMA'] < -0.048) & (df['smoothed_derivative'] < 0)&  ((df['polyfit_slope'] < 0) | (df['slope_degrees'] < 0)) & (df['vwap_signalSell']) #-0.03 -0.0183& (df['smoothed_derivative'] < 0) & (df['POCDistanceEMA'] < -0.01)#&  (df['momentum'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
+        #df['sell_signal'] = (df['POCDistanceEMA'].abs() <= 0.021) & (df['smoothed_derivative'] < 0) & ((df['polyfit_slope'] < 0) | (df['slope_degrees'] < 0))#(df['smoothed_1ema'] <= df['POC'])  & (df['POCDistanceEMA'] < -0.048) & (df['smoothed_derivative'] < 0)&  ((df['polyfit_slope'] < 0) | (df['slope_degrees'] < 0)) & (df['vwap_signalSell']) #-0.03 -0.0183& (df['smoothed_derivative'] < 0) & (df['POCDistanceEMA'] < -0.01)#&  (df['momentum'] < 0)  #& (df['1ema'] <= df['vwap']) #& (df['2ema'] <= df['POC'])#(df['derivative_1'] < 0) (df['lsf'] <= df['POC']) #(df['1ema'] < df['POC2']) &    #& (df['holt_winters'] <= df['POC2'])# & (df['derivative_1'] <= 0) & (df['derivative_1'] <= df['kalman_velocity'])# )# & (df['1ema'].shift(1) <= df['POC2'].shift(1)) # & (df['Signal']  > df['MACD']) #(df['1ema'].shift(1) > df['POC2'].shift(1)) &
 
-        numm = 2
-        df['buy_signal'] = (df['cross_above'])#.rolling(window=numm, min_periods=numm).sum() == numm) #& (df['smoothed_1ema'] >= df['positive_threshold'])# & (df['smoothed_derivative'] > df['positive_mean']) & (df['POCDistanceEMA'] > df['positive_meanEma'])# & (df['POCDistanceEMA'] > df['positive_percentile'])# & (df['rolling_imbalance'] > 0)#& (df['rolling_imbalance'] > 0) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
-        df['sell_signal'] = (df['cross_below'])#.rolling(window=numm, min_periods=numm).sum() == numm) #& (df['smoothed_1ema'] <= df['negative_threshold'])# & (df['smoothed_derivative'] < df['negative_mean']) & (df['POCDistanceEMA'] < df['positive_meanEma'])# & (df['POCDistanceEMA'] < df['negative_percentile'])# & (df['rolling_imbalance'] < 0)#& (df['rolling_imbalance'] < 0) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
+        #df['buy_signal'] = (df['cross_above']) #& (df['smoothed_1ema'] >= df['positive_threshold'])# & (df['smoothed_derivative'] > df['positive_mean']) & (df['POCDistanceEMA'] > df['positive_meanEma'])# & (df['POCDistanceEMA'] > df['positive_percentile'])# & (df['rolling_imbalance'] > 0)#& (df['rolling_imbalance'] > 0) #&   (df['rolling_imbalance'] >=  rollingThres)# & (df['POCDistance'] <= thresholdTwo))
+        #df['sell_signal'] = (df['cross_below']) #& (df['smoothed_1ema'] <= df['negative_threshold'])# & (df['smoothed_derivative'] < df['negative_mean']) & (df['POCDistanceEMA'] < df['positive_meanEma'])# & (df['POCDistanceEMA'] < df['negative_percentile'])# & (df['rolling_imbalance'] < 0)#& (df['rolling_imbalance'] < 0) #& (df['rolling_imbalance'] <= -rollingThres)# & (df['POCDistance'] >= -thresholdTwo))
         
     except(NotFound):
         pass
-        
-     
-    #try:
+    '''
+    df['stillbuy'] = False
+    df['stillsell'] = False
+    
+    # Initialize tracking variables
+    stillbuy = False
+    stillsell = False
+    
+    # Iterate through the DataFrame rows
+    for p in range(len(df)):
+        # Check if buy_signal is triggered
+        if df['buy_signal'][p]:
+            stillbuy = True
+            stillsell = False  # Reset stillsell when a buy is triggered
+    
+        # Check if sell_signal is triggered
+        if df['sell_signal'][p]:
+            stillsell = True
+            stillbuy = False  # Reset stillbuy when a sell is triggered
+    
+        # Update the tracking columns
+        df.at[p, 'stillbuy'] = stillbuy
+        df.at[p, 'stillsell'] = stillsell
+
+    # Define conditions for ending a buy or sell
+    df['endBuy'] = (df['stillbuy']) & (df['smoothed_1ema'] <= df['POC']) & (df['POCDistanceEMA'] < -0.048) & (df['smoothed_derivative'] < 0) & ((df['polyfit_slope'] < 0) | (df['slope_degrees'] < 0)) & (df['vwap_signalSell'])
+    
+    df['endSell'] = (df['sell_signal']) & (df['smoothed_1ema'] >= df['POC']) & (df['POCDistanceEMA'] > 0.048) & (df['smoothed_derivative'] > 0) & ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0)) & (df['vwap_signalBuy'])
+    
+    # Initialize new tracking signals for forced cross changes
+    #df['cross_above'] = False
+    #df['cross_below'] = False
+    
+    # Handle transitions based on endBuy and endSell
+    for p in range(len(df)):
+        if df['endBuy'][p]:  # When endBuy is triggered
+            df.at[p, 'sell_signal'] = True  # Start a sell signal
+            #df.at[p, 'cross_below'] = True  # Manually trigger a new cross_below
+            #df.at[p, 'stillbuy'] = False  # End stillbuy
+            #df.at[p, 'stillsell'] = True  # Start stillsell
+    
+        if df['endSell'][p]:  # When endSell is triggered
+            df.at[p, 'buy_signal'] = True  # Start a buy signal
+            #df.at[p, 'cross_above'] = True  # Manually trigger a new cross_above
+            #df.at[p, 'stillsell'] = False  # End stillsell
+            #df.at[p, 'stillbuy'] = True  # Start stillbuy
+        #try:
         #mboString = '('+str(round(df['positive_mean'].iloc[-1], 3)) + ' | ' + str(round(df['negative_mean'].iloc[-1], 3))+') --' + ' ('+str(round(df['positive_meanEma'].iloc[-1], 3)) + ' | ' + str(round(df['negative_meanEma'].iloc[-1], 3))+') '+slope#str(round((abs(df['HighVA'][len(df)-1] - df['LowVA'][len(df)-1]) / ((df['HighVA'][len(df)-1] + df['LowVA'][len(df)-1]) / 2)) * 100,3))
     #except(KeyError):
-    mboString = ''
+    '''
+    df['stillbuy'] = False
+    df['stillsell'] = False
+    df['buy_signal'] = False
+    df['sell_signal'] = False
+    
+    # Initialize tracking variables
+    stillbuy = False
+    stillsell = False
+    
+    for p in range(len(df)):
+        # Initial trade entry conditions (fixed for better execution) not stillsell and
+        if not stillsell and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021)  & (df.at[p, 'smoothed_derivative'] > 0) & ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0))):
+            df.at[p, 'buy_signal'] = True
+            stillbuy = True
+            stillsell = False  
+    #not stillbuy and
+        if not stillbuy and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021) & (df.at[p, 'smoothed_derivative'] < 0) & ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0))):
+            df.at[p, 'sell_signal'] = True
+            stillsell = True
+            stillbuy = False  
+    
+        # Exit condition for stillbuy → Trigger a sell
+        if (
+            stillbuy and 
+            (df.at[p, 'smoothed_1ema'] <= df.at[p, 'POC']) and 
+            (df.at[p, 'POCDistanceEMA'] < -0.048) and 
+            (df.at[p, 'smoothed_derivative'] < 0) and 
+            ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
+            (df.at[p, 'vwap_signalSell'])
+        ):
+            df.at[p, 'sell_signal'] = True  # Trigger sell
+            stillbuy = False  # Stop buy tracking
+            stillsell = True  # Start sell tracking
+    
+        # Exit condition for stillsell → Trigger a buy
+        if (
+            stillsell and 
+            (df.at[p, 'smoothed_1ema'] >= df.at[p, 'POC']) and 
+            (df.at[p, 'POCDistanceEMA'] > 0.048) and 
+            (df.at[p, 'smoothed_derivative'] > 0) and 
+            ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
+            (df.at[p, 'vwap_signalBuy'])
+        ):
+            df.at[p, 'buy_signal'] = True  # Trigger buy
+            stillsell = False  # Stop sell tracking
+            stillbuy = True  # Start buy tracking
+            
+            
+        if (
+            not stillsell and not stillbuy and 
+            (df.at[p, 'smoothed_1ema'] >= df.at[p, 'POC']) and 
+            (df.at[p, 'POCDistanceEMA'] > 0.048) and 
+            (df.at[p, 'smoothed_derivative'] > 0) and 
+            ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
+            (df.at[p, 'vwap_signalBuy'])
+        ):
+            df.at[p, 'buy_signal'] = True  # Trigger buy
+            stillsell = False  # Stop sell tracking
+            stillbuy = True  # Start buy tracking
+            
+        if (
+            not stillsell and not stillbuy and 
+            (df.at[p, 'smoothed_1ema'] <= df.at[p, 'POC']) and 
+            (df.at[p, 'POCDistanceEMA'] < -0.048) and 
+            (df.at[p, 'smoothed_derivative'] < 0) and 
+            ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
+            (df.at[p, 'vwap_signalSell'])
+        ):
+            df.at[p, 'sell_signal'] = True  # Trigger sell
+            stillbuy = False  # Stop buy tracking
+            stillsell = True  # Start sell tracking
+            
+    
+        # Update tracking columns
+        df.at[p, 'stillbuy'] = stillbuy
+        df.at[p, 'stillsell'] = stillsell
+    
+
 
     #calculate_ttm_squeeze(df)
     
@@ -3179,7 +3398,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     
     
-    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, mboString=mboString,  stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterNum=int(clustNum), troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
  
     return stored_data, fg, previous_stkName, previous_interv, interval_time
 
