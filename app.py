@@ -2370,43 +2370,43 @@ def calculate_polyfit_slope_weighted(index, values, window_size):
         return 0.0
 
 def vwapDistanceCheckBuy(df):
-    if abs(df['vwapDistance']) <= 0.28:
+    if abs(df['vwapDistance']) <= 0.25:
         return df['smoothed_1ema'] > df['vwap']
     return True
 
 def vwapDistanceCheckSell(df):
-    if abs(df['vwapDistance']) <= 0.28:#0.09
+    if abs(df['vwapDistance']) <= 0.25:#0.09
         return df['smoothed_1ema'] < df['vwap']
     return True
 
 
 def uppervwapDistanceCheckBuy(df):
-    if abs(df['uppervwapDistance']) <= 0.28:
+    if abs(df['uppervwapDistance']) <= 0.25:
         return df['smoothed_1ema'] > df['uppervwapAvg']
     return True
 
 def uppervwapDistanceCheckSell(df):
-    if abs(df['uppervwapDistance']) <= 0.28:
+    if abs(df['uppervwapDistance']) <= 0.25:
         return df['smoothed_1ema'] < df['uppervwapAvg']
     return True
 
 def lowervwapDistanceCheckBuy(df):
-    if abs(df['lowervwapDistance']) <= 0.28:
+    if abs(df['lowervwapDistance']) <= 0.25:
         return df['smoothed_1ema'] > df['lowervwapAvg']
     return True
 
 def lowervwapDistanceCheckSell(df):
-    if abs(df['lowervwapDistance']) <= 0.28:
+    if abs(df['lowervwapDistance']) <= 0.25:
         return df['smoothed_1ema'] < df['lowervwapAvg'] 
     return True
 
 def vwapAvgDistanceCheckBuy(df):
-    if abs(df['vwapAvgDistance']) <= 0.28:
+    if abs(df['vwapAvgDistance']) <= 0.25:
         return df['smoothed_1ema'] > df['vwapAvg']
     return True
 
 def vwapAvgDistanceCheckSell(df):
-    if abs(df['vwapAvgDistance']) <= 0.28:
+    if abs(df['vwapAvgDistance']) <= 0.25:
         return df['smoothed_1ema'] < df['vwapAvg'] 
     return True
 
@@ -2749,8 +2749,8 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     vwap(df)
     ema(df)
     PPP(df)
-    df['uppervwapAvg'] = df['STDEV_2'].cumsum() / (df.index + 1)
-    df['lowervwapAvg'] = df['STDEV_N2'].cumsum() / (df.index + 1)
+    df['uppervwapAvg'] = df['STDEV_25'].cumsum() / (df.index + 1)
+    df['lowervwapAvg'] = df['STDEV_N25'].cumsum() / (df.index + 1)
     df['vwapAvg'] = df['vwap'].cumsum() / (df.index + 1)
     
     '''
