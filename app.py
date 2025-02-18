@@ -1595,7 +1595,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             colors.append(color)
         fig.add_trace(go.Bar(x=df['time'], y=df['smoothed_derivative'], marker_color=colors), row=3, col=1)
         
-     '''   
+        
 
     if 'POCDistanceEMA' in df.columns:
         colors = ['maroon']
@@ -1610,6 +1610,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                     color='crimson' 
             colors.append(color)
         fig.add_trace(go.Bar(x=df['time'], y=df['POCDistanceEMA'], marker_color=colors), row=2, col=1)
+    '''  
+    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topBuys'], marker_color='teal'), row=2, col=1)
+    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topSells'], marker_color='crimson'), row=2, col=1)
+        
+        
 
     
     #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[2] for i in OptionTimeFrame]), marker_color='teal'), row=3, col=1)
