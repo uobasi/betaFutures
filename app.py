@@ -826,6 +826,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
     fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Posdiff'], marker_color='teal'), row=3, col=1)
     fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Negdiff'], marker_color='crimson'), row=3, col=1)
+
+    fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.50, name='P',marker_color='#0000FF')) # #0000FF
+    fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30,name='HighVA',marker_color='rgba(0,0,0)'))
     
         #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
@@ -845,7 +849,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
 
     fig.add_hline(y=0, row=3, col=1)
 
-    fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP', line=dict(color='crimson')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP',opacity=0.50, line=dict(color='crimson')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['9ema'], mode='lines',name='9ema'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['20ema'], mode='lines',name='20ema'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2'))
@@ -866,7 +870,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg'], mode='lines',opacity=0.30,name='lowervwapAvg', ))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', opacity=0.30,name='vwapAvg', ))
     
-    
+    '''
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', opacity=0.1, name='UPPERVWAP2', line=dict(color='black')))
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N2'], mode='lines', opacity=0.1, name='LOWERVWAP2', line=dict(color='black')))
 
@@ -881,7 +885,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
 
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_0'], mode='lines', opacity=0.1, name='UPPERVWAP0.5', line=dict(color='black')))
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_N0'], mode='lines', opacity=0.1, name='LOWERVWAP0.5', line=dict(color='black')))
-    
+    '''
     #fig.add_trace(go.Scatter(x=df['time'], y=df['1ema'], mode='lines', opacity=0.19, name='1ema',marker_color='rgba(0,0,0)'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', name='UPPERVWAP'))
     '''
