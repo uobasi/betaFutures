@@ -1799,7 +1799,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     fig.add_trace(
         go.Table(
             header=dict(values=["Time", "Buyers", "Buyers Change", "Sellers", "Sellers Change","Buyers per Interval", "Sellers per Interval"], font=dict(size=9)),
-            cells=dict(values=transposed_data, fill_color=color_matrix, font=dict(color=textColor_matrix,size=9)),  # Transpose data to fit the table
+            cells=dict(values=transposed_data, fill_color=color_matrix, font=dict(color=textColor_matrix,size=6)),  # Transpose data to fit the table
         ),
         row=2, col=2
     )
