@@ -2492,8 +2492,12 @@ def double_exponential_smoothing(X, alpha, beta):
     
     return S
    
-symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
-symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
+#symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
+#symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
+
+symbolNumList =  ['4916', '42075294', '42003068', '423318', '19604', '42009162', '42021396', '42005804']
+symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'RTY', 'MBT', 'MET']
+
 
 intList = [str(i) for i in range(3,30)]
 
