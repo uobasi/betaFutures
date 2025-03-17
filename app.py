@@ -1388,7 +1388,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                 visible=False,
                                 mode= 'lines',
                                 ))
-        
+        '''
         if '01:00:00' in df['time'].values:
             #fig.add_vline(x=df[df['time'] == '01:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Sydney Close', annotation_position='top left', row=1, col=1)
             
@@ -1427,7 +1427,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     #visible=False,
                                     #mode= 'lines',
                                     #))
-            
+            '''
             
 
         if '02:00:00' in df['time'].values:
