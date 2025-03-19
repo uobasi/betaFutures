@@ -1378,14 +1378,14 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         elif '19:01:00' in df['time'].values:
             opstr = '19:01:00'
             
-        fig.add_vline(x=df[df['time'] == opstr].index[0], line_width=1, line_dash="dash", line_color="green", annotation_text='Tokyo Open', annotation_position='top left', row=1, col=1)
+        fig.add_vline(x=df[df['time'] == opstr].index[0], line_width=1, line_dash="dash", line_color="green", annotation_text='Toyko Open', annotation_position='top left', row=1, col=1)
         
         fig.add_trace(go.Scatter(x=df['time'],
                                 y= [df['open'][df[df['time'] == '19:00:00'].index[0]]]*len(df['time']) ,
                                 line_color='black',
                                 text = str(df['open'][df[df['time'] == '19:00:00'].index[0]]),
                                 textposition="bottom left",
-                                name='Tokyo Open',
+                                name='Toyko Open',
                                 showlegend=False,
                                 visible=False,
                                 mode= 'lines',
@@ -1448,7 +1448,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             
     
         if '04:00:00' in df['time'].values:
-            fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=1, line_dash="dash", line_color="red", annotation_text='Tokyo Close', annotation_position='top left', row=1, col=1)
+            fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=1, line_dash="dash", line_color="red", annotation_text='Toyko Close', annotation_position='top left', row=1, col=1)
             
             tempDf = df.loc[df[df['time'] == opstr].index[0]:df[df['time'] == '04:00:00'].index[0]]
             max_high = tempDf['high'].max()
@@ -1458,7 +1458,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     line_color='black',
                                     text = str(max_high),
                                     textposition="bottom left",
-                                    name='Tokyo High',
+                                    name='Toyko High',
                                     showlegend=False,
                                     visible=False,
                                     mode= 'lines',
@@ -1469,7 +1469,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     line_color='black',
                                     text = str(min_low),
                                     textposition="bottom left",
-                                    name='Tokyo Low',
+                                    name='Toyko Low',
                                     showlegend=False,
                                     visible=False,
                                     mode= 'lines',
@@ -1481,7 +1481,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     #line_color='black',
                                     #text = str(df['close'][df[df['time'] == '03:58:00'].index[0]]),
                                     #textposition="bottom left",
-                                    #name='Tokyo Close',
+                                    #name='Toyko Close',
                                     #showlegend=False,
                                     #visible=False,
                                     #mode= 'lines',
@@ -1550,7 +1550,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     
          
     if '04:00:00' in df['time'].values:
-        fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Tokyo Close', annotation_position='top right', row=1, col=1)
+        fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Toyko Close', annotation_position='top right', row=1, col=1)
      
     
     if '08:00:00' in df['time'].values:
@@ -3488,13 +3488,13 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     except(NotFound):
         pass
     
-    df['timeStr'] = pd.to_datetime(df['time'], format='%H:%M:%S').dt.time
+    #df['timeStr'] = pd.to_datetime(df['time'], format='%H:%M:%S').dt.time
 
     # Define the target 19:00 time
-    target_time = pd.to_datetime('19:00:00', format='%H:%M:%S').time()
+    #target_time = pd.to_datetime('19:00:00', format='%H:%M:%S').time()
     
     # Create a new boolean column: True if time >= 19:00, else False
-    df['has_19_passed'] = df['timeStr'] >= target_time
+    #df['has_19_passed'] = df['timeStr'] >= target_time
     '''
     df['stillbuy'] = False
     df['stillsell'] = False
@@ -3554,8 +3554,11 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     stillbuy = False
     stillsell = False
     
+    #df['timestamp'][df.index[df['time'] == "19:00:00"].tolist()[0]]
+    df['has_19_occurred'] = df['time'].eq("19:00:00").cumsum().astype(bool)
+    
     for p in range(len(df)):
-        if (df.at[p, 'has_19_passed']):
+        if df.at[p, 'has_19_occurred']:
             # Initial trade entry conditions (fixed for better execution) not stillsell and
             if not stillsell and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021)  & (df.at[p, 'smoothed_derivative'] > 0) & ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0))):
                 df.at[p, 'buy_signal'] = True
@@ -3642,7 +3645,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             # Update tracking columns
             df.at[p, 'stillbuy'] = stillbuy
             df.at[p, 'stillsell'] = stillsell
-        
+    
 
 
     #calculate_ttm_squeeze(df)
