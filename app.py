@@ -1378,14 +1378,14 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         elif '19:01:00' in df['time'].values:
             opstr = '19:01:00'
             
-        fig.add_vline(x=df[df['time'] == opstr].index[0], line_width=1, line_dash="dash", line_color="green", annotation_text='Toyko Open', annotation_position='top left', row=1, col=1)
+        fig.add_vline(x=df[df['time'] == opstr].index[0], line_width=1, line_dash="dash", line_color="green", annotation_text='Tokyo Open', annotation_position='top left', row=1, col=1)
         
         fig.add_trace(go.Scatter(x=df['time'],
                                 y= [df['open'][df[df['time'] == '19:00:00'].index[0]]]*len(df['time']) ,
                                 line_color='black',
                                 text = str(df['open'][df[df['time'] == '19:00:00'].index[0]]),
                                 textposition="bottom left",
-                                name='Toyko Open',
+                                name='Tokyo Open',
                                 showlegend=False,
                                 visible=False,
                                 mode= 'lines',
@@ -1448,7 +1448,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             
     
         if '04:00:00' in df['time'].values:
-            fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=1, line_dash="dash", line_color="red", annotation_text='Toyko Close', annotation_position='top left', row=1, col=1)
+            fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=1, line_dash="dash", line_color="red", annotation_text='Tokyo Close', annotation_position='top left', row=1, col=1)
             
             tempDf = df.loc[df[df['time'] == opstr].index[0]:df[df['time'] == '04:00:00'].index[0]]
             max_high = tempDf['high'].max()
@@ -1458,7 +1458,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     line_color='black',
                                     text = str(max_high),
                                     textposition="bottom left",
-                                    name='Toyko High',
+                                    name='Tokyo High',
                                     showlegend=False,
                                     visible=False,
                                     mode= 'lines',
@@ -1469,7 +1469,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     line_color='black',
                                     text = str(min_low),
                                     textposition="bottom left",
-                                    name='Toyko Low',
+                                    name='Tokyo Low',
                                     showlegend=False,
                                     visible=False,
                                     mode= 'lines',
@@ -1481,7 +1481,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     #line_color='black',
                                     #text = str(df['close'][df[df['time'] == '03:58:00'].index[0]]),
                                     #textposition="bottom left",
-                                    #name='Toyko Close',
+                                    #name='Tokyo Close',
                                     #showlegend=False,
                                     #visible=False,
                                     #mode= 'lines',
@@ -1550,7 +1550,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     
          
     if '04:00:00' in df['time'].values:
-        fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Toyko Close', annotation_position='top right', row=1, col=1)
+        fig.add_vline(x=df[df['time'] == '04:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Tokyo Close', annotation_position='top right', row=1, col=1)
      
     
     if '08:00:00' in df['time'].values:
