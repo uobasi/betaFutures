@@ -620,7 +620,7 @@ def find_spikes(data, high_percentile=97, low_percentile=3):
     
     return spikes
 
-def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:list=[],   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterList:list=[], troInterval:list=[]):
+def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:list=[],   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterList:list=[], troInterval:list=[], toggle_value:list=[], poly_value:list=[]):
   
     notround = np.average(df_dx)
     average = round(np.average(df_dx), 3)
@@ -820,12 +820,14 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_trace(go.Scatter(x=df['time'], y=df['negative_threshold'], mode='lines',name='negative_threshold'))
     #fig.add_hline(y=70, row=2, col=1)
     #fig.add_hline(y=30, row=2, col=1)
-    
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['polyfit_slope'], mode='lines',name='polyfit_slope'), row=3, col=1) 
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['slope_degrees'], mode='lines',name='slope_degrees'), row=3, col=1)
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
-    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Posdiff'], marker_color='teal'), row=3, col=1)
-    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Negdiff'], marker_color='crimson'), row=3, col=1)
+    if 'Poly' in poly_value:
+        fig.add_trace(go.Scatter(x=df['time'], y=df['polyfit_slope'], mode='lines',name='polyfit_slope'), row=3, col=1) 
+        fig.add_trace(go.Scatter(x=df['time'], y=df['slope_degrees'], mode='lines',name='slope_degrees'), row=3, col=1)
+        fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
+        fig.add_hline(y=0, row=3, col=1)
+    else:
+        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Posdiff'], marker_color='teal'), row=3, col=1)
+        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Negdiff'], marker_color='crimson'), row=3, col=1)
 
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.50, name='P',marker_color='#0000FF')) # #0000FF
     #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
@@ -843,8 +845,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
 
         #fig.add_trace(go.Scatter(x=df['time'], y=df['close'].rolling(window=clusterNum).mean(), mode='lines',name=str(clusterNum)+'ema'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['lsfreal_time'], mode='lines',name='lsfreal_time'), row=2, col=1)
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'), row=2, col=1)
-        #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'), row=2, col=1)
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30, name='HighVA',marker_color='rgba(0,0,0)'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
 
 
     #fig.add_hline(y=0, row=3, col=1)
@@ -856,7 +858,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     
     
     #if 'POC' in df.columns:
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.80,marker_color='#0000FF'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.50,marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.80, name='POC',marker_color='#0000FF'))
@@ -1597,8 +1599,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         fig.add_trace(go.Bar(x=df['time'], y=df['smoothed_derivative'], marker_color=colors), row=3, col=1)
         
         
-
-    if 'POCDistanceEMA' in df.columns:
+    '''
+    if 'poc' in toggle_value and 'POCDistanceEMA' in df.columns:
         colors = ['maroon']
         for val in range(1,len(df['POCDistanceEMA'])):
             if df['POCDistanceEMA'][val] > 0:
@@ -1611,9 +1613,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                     color='crimson' 
             colors.append(color)
         fig.add_trace(go.Bar(x=df['time'], y=df['POCDistanceEMA'], marker_color=colors), row=2, col=1)
-    '''  
-    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topBuys'], marker_color='teal'), row=2, col=1)
-    fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topSells'], marker_color='crimson'), row=2, col=1)
+     
+    else:
+        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topBuys'], marker_color='teal'), row=2, col=1)
+        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topSells'], marker_color='crimson'), row=2, col=1)
         
         
 
@@ -2406,45 +2409,67 @@ def calculate_polyfit_slope_weighted(index, values, window_size):
         return 0.0
 
 def vwapDistanceCheckBuy(df):
-    if abs(df['vwapDistance']) <= 0.25:
+    if abs(df['vwapDistance']) < 0.15:
         return df['smoothed_1ema'] > df['vwap']
     return True
 
 def vwapDistanceCheckSell(df):
-    if abs(df['vwapDistance']) <= 0.25:#0.09
+    if abs(df['vwapDistance']) < 0.15:#0.25
         return df['smoothed_1ema'] < df['vwap']
     return True
 
 
 def uppervwapDistanceCheckBuy(df):
-    if abs(df['uppervwapDistance']) <= 0.25:
+    if abs(df['uppervwapDistance']) < 0.15:
         return df['smoothed_1ema'] > df['uppervwapAvg']
     return True
 
 def uppervwapDistanceCheckSell(df):
-    if abs(df['uppervwapDistance']) <= 0.25:
+    if abs(df['uppervwapDistance']) < 0.15:
         return df['smoothed_1ema'] < df['uppervwapAvg']
     return True
 
 def lowervwapDistanceCheckBuy(df):
-    if abs(df['lowervwapDistance']) <= 0.25:
+    if abs(df['lowervwapDistance']) < 0.15:
         return df['smoothed_1ema'] > df['lowervwapAvg']
     return True
 
 def lowervwapDistanceCheckSell(df):
-    if abs(df['lowervwapDistance']) <= 0.25:
+    if abs(df['lowervwapDistance']) < 0.15:
         return df['smoothed_1ema'] < df['lowervwapAvg'] 
     return True
 
 def vwapAvgDistanceCheckBuy(df):
-    if abs(df['vwapAvgDistance']) <= 0.25:
+    if abs(df['vwapAvgDistance']) < 0.15:
         return df['smoothed_1ema'] > df['vwapAvg']
     return True
 
 def vwapAvgDistanceCheckSell(df):
-    if abs(df['vwapAvgDistance']) <= 0.25:
+    if abs(df['vwapAvgDistance']) < 0.15:
         return df['smoothed_1ema'] < df['vwapAvg'] 
     return True
+
+def LVADistanceCheckBuy(df):
+    if abs(df['LVADistance']) < 0.15:
+        return df['smoothed_1ema'] > df['LowVA']
+    return True
+
+def LVADistanceCheckSell(df):
+    if abs(df['LVADistance']) < 0.15:#0.25
+        return df['smoothed_1ema'] < df['LowVA']
+    return True
+
+
+def HVADistanceCheckBuy(df):
+    if abs(df['HVADistance']) < 0.15:
+        return df['smoothed_1ema'] > df['HighVA']
+    return True
+
+def HVADistanceCheckSell(df):
+    if abs(df['HVADistance']) < 0.15:#0.25
+        return df['smoothed_1ema'] < df['HighVA']
+    return True
+
 
 def double_exponential_smoothing(X, alpha, beta):
     """
@@ -2487,6 +2512,67 @@ def double_exponential_smoothing(X, alpha, beta):
         S[t] = A[t] + B[t]
     
     return S
+
+
+def double_exponential_smoothing_1(X, alpha, beta):
+    """
+    Applies double exponential smoothing (Holt's linear trend method) to a pandas Series.
+    """
+    if isinstance(X, (pd.Series, pd.DataFrame)):
+        X = X.iloc[:, 0] if isinstance(X, pd.DataFrame) else X
+        X = X.values  # Convert to NumPy array
+
+    X = np.asarray(X)  # Ensure it's an array
+
+    if X.shape[0] < 2:
+        raise ValueError("Input series X must contain at least two elements.")
+
+    S, A, B = [np.zeros(len(X)) for _ in range(3)]
+
+    S[0] = X[0]
+    A[0] = X[0]
+    B[0] = X[1] - X[0]
+
+    for t in range(1, len(X)):
+        A[t] = alpha * X[t] + (1 - alpha) * S[t - 1]
+        B[t] = beta * (A[t] - A[t - 1]) + (1 - beta) * B[t - 1]
+        S[t] = A[t] + B[t]
+
+    return np.array(S).squeeze()
+
+def apply_kalman_filter_1(data, transition_covariance, observation_covariance):
+    """
+    Applies Kalman Filter to smooth a time-series dataset.
+
+    Parameters:
+    - data (array-like): Time series to be smoothed (e.g., EMA or price).
+    - transition_covariance (float): Process noise covariance.
+    - observation_covariance (float): Measurement noise covariance.
+
+    Returns:
+    - np.array: Smoothed 1D time series.
+    """
+    # Ensure input is a 1D NumPy array
+    data = np.asarray(data).squeeze()
+
+    # Handle edge case where data length is too short
+    if len(data) < 2:
+        raise ValueError("Input data must have at least two points.")
+
+    # Initialize the Kalman Filter
+    kf = KalmanFilter(
+        transition_matrices=[1],  # State transition matrix
+        observation_matrices=[1],  # Observation matrix
+        initial_state_mean=data[0],  # Initial state estimate
+        initial_state_covariance=1,  # Initial covariance estimate
+        observation_covariance=observation_covariance,  # Measurement noise covariance
+        transition_covariance=transition_covariance  # Process noise covariance
+    )
+
+    # Use the Kalman filter to estimate the state
+    state_means, _ = kf.filter(data)
+
+    return np.array(state_means).squeeze()
    
 #symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
 #symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
@@ -2505,8 +2591,8 @@ covarianceList = [str(round(i, 2)) for i in [x * 0.01 for x in range(1, 1000)]]
 
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
-#abg = download_data(bucket, 'DailyNQ')
 
+'''
 styles = {
     'main_container': {
         'display': 'flex',
@@ -2545,13 +2631,13 @@ styles = {
         'textAlign': 'center'
     }
 }
-
+'''
 
 #import pandas_ta as ta
 #from collections import Counter
 #from filterpy.kalman import KalmanFilter
 from google.api_core.exceptions import NotFound
-from scipy.signal import filtfilt, butter, lfilter
+#from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 1800000  # Initial interval #210000#250000#80001
 subsequent_inter = 80000  # Subsequent interval
@@ -2566,29 +2652,49 @@ app.layout = html.Div([
         n_intervals=0,
       ),
     html.Div([
+        dcc.Checklist(
+            id='poly-button',
+            options=[{'label': 'Show Indicator 2', 'value': 'Poly'}],
+            value=[],  # Default unchecked
+            inline=True,
+            className="toggle-container-bottom"
+        ),
+    ], className="toggle-wrapper"),
+    
+    
+    html.Div([
+        dcc.Checklist(
+            id='toggle-button',
+            options=[{'label': 'Show Indicator 1', 'value': 'poc'}],
+            value=[],  # Default unchecked
+            inline=True,
+            className="toggle-container-bottom"
+        ),
+    ], className="toggle-wrapper"),
+    
+    
+    
+
+    html.Div([
         html.Div([
-            dcc.Input(id='input-on-submit', type='text', style=styles['input']),
-            html.Button('Submit', id='submit-val', n_clicks=0, style=styles['button']),
-            html.Div(id='container-button-basic', children="Enter a symbol from ES, NQ", style=styles['label']),
-        ], style=styles['sub_container']),
+            dcc.Input(id='input-on-submit', type='text', className="input-field"),
+            html.Button('Submit', id='submit-val', n_clicks=0, className="submit-button"),
+            html.Div(id='container-button-basic', children="Enter a symbol from ES, NQ", className="label-text"),
+        ], className="sub-container"),
         dcc.Store(id='stkName-value'),
-        
+
         html.Div([
-            dcc.Input(id='input-on-interv', type='text', style=styles['input']),
-            html.Button('Submit', id='submit-interv', n_clicks=0, style=styles['button']),
-            html.Div(id='interv-button-basic',children="Enter interval from 3-30, Default 10 mins", style=styles['label']),
-        ], style=styles['sub_container']),
+            dcc.Input(id='input-on-interv', type='text', className="input-field"),
+            html.Button('Submit', id='submit-interv', n_clicks=0, className="submit-button"),
+            html.Div(id='interv-button-basic', children="Enter interval from 3-30, Default 10 mins", className="label-text"),
+        ], className="sub-container"),
         dcc.Store(id='interv-value'),
-        
-        
-    ], style=styles['main_container']),
-    
-    
+    ], className="main-container"),
+
     dcc.Store(id='data-store'),
     dcc.Store(id='previous-interv'),
     dcc.Store(id='previous-stkName'),
     dcc.Store(id='interval-time', data=initial_inter),
-  
 ])
 
 @callback(
@@ -2634,7 +2740,9 @@ def update_interval(n_clicks, value):
         Output('previous-stkName', 'data'),
         Output('previous-interv', 'data'),
         Output('interval', 'interval')],
-    [Input('interval', 'n_intervals')],
+    [Input('interval', 'n_intervals'),
+     Input('toggle-button', 'value'),
+     Input('poly-button', 'value')], 
     [State('stkName-value', 'data'),
         State('interv-value', 'data'),
         State('data-store', 'data'),
@@ -2645,7 +2753,7 @@ def update_interval(n_clicks, value):
     ],
 )
     
-def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName, previous_interv, interval_time): #interv
+def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stored_data, previous_stkName, previous_interv, interval_time): #interv
     
     #print(sname, interv, stored_data, previous_stkName)
     #print(interv)
@@ -3219,7 +3327,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     try:
         df['LowVA'] = pd.Series([i[0] for i in stored_data['pdata']])
         df['HighVA'] = pd.Series([i[1] for i in stored_data['pdata']])
-        df['POC'] = pd.Series([i[2] for i in stored_data['pdata']])
+        df['POC'] = pd.Series([i[5] for i in stored_data['pdata']])
         df['POC2'] = pd.Series([i[5] for i in stored_data['pdata']])
         df['weights'] = [i[2]-i[3] for i in stored_data['timeFrame']]
         '''
@@ -3254,12 +3362,17 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         #df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
         
         df['smoothed_1ema'] = double_exponential_smoothing(df['1ema'], 0.5, 0.01)#apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
+        #df['smoothed_1ema'] = 0.3 * double_exponential_smoothing_1(df['1ema'], 0.7, 0.01) + \
+                         #0.7 * apply_kalman_filter_1(df['1ema'], transition_covariance=float(curvature), 
+                         #                          observation_covariance=float(curvatured2))
         df['POCDistance'] = (df['smoothed_1ema'] - df['POC']) / df['POC'] * 100
         df['POCDistanceEMA'] = df['POCDistance']#((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
         df['vwapDistance'] = (df['smoothed_1ema'] - df['vwap']) / df['vwap'] * 100
         df['uppervwapDistance'] = (df['smoothed_1ema'] - df['uppervwapAvg']) / df['uppervwapAvg'] * 100
         df['lowervwapDistance'] = (df['smoothed_1ema'] - df['lowervwapAvg']) / df['lowervwapAvg'] * 100
         df['vwapAvgDistance'] = (df['smoothed_1ema'] - df['vwapAvg']) / df['vwapAvg'] * 100
+        df['LVADistance'] = (df['smoothed_1ema'] - df['LowVA']) / df['LowVA'] * 100
+        df['HVADistance'] = (df['smoothed_1ema'] - df['HighVA']) / df['HighVA'] * 100
         #df['POCDistanceEMA'] = df['POCDistanceEMA'].ewm(span=2, adjust=False).mean()#gaussian_filter1d(df['POCDistanceEMA'], sigma=int(1))##
         #df['POCDistanceEMA'] = exponential_median(df['POCDistanceEMA'].values, span=2)
         
@@ -3331,7 +3444,7 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['polyfit_slope'] = [calculate_polyfit_slope_rolling(i, df['smoothed_1ema'].values, int(15)) for i in range(len(df))]
         #df['hybrid'] = [calculate_hybrid_slope(i, df['smoothed_1ema'].values, int(30)) for i in range(len(df))]
         
-        slope = str(df['slope_degrees'].iloc[-1]) + ' ' + str(df['polyfit_slope'].iloc[-1])
+        #slope = str(df['slope_degrees'].iloc[-1]) + ' ' + str(df['polyfit_slope'].iloc[-1])
         
         #df['atr'] = compute_atr(df) #period=int(clustNum)
         #df['positive_threshold'] = df['POC'] + 1.2 * df['atr']
@@ -3357,6 +3470,13 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         df['vwapAvg_signalBuy'] = df.apply(vwapAvgDistanceCheckBuy, axis=1)
         df['vwapAvg_signalSell'] = df.apply(vwapAvgDistanceCheckSell, axis=1)  
         
+        df['LVA_signalBuy'] =  df.apply(LVADistanceCheckBuy, axis=1)
+        df['LVA_signalSell'] = df.apply(LVADistanceCheckSell, axis=1)
+        
+        df['HVA_signalBuy'] =  df.apply(HVADistanceCheckBuy, axis=1)
+        df['HVA_signalSell'] = df.apply(HVADistanceCheckSell, axis=1)
+        
+        
         #df['buy_signal'] = (df['POCDistanceEMA'].abs() <= 0.021) & (df['smoothed_derivative'] > 0) & ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0))#(df['smoothed_1ema'] >= df['POC']) & (df['POCDistanceEMA'] > 0.048) & (df['smoothed_derivative'] > 0)& ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0)) & (df['vwap_signalBuy'])#0.03 0.0183& (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
         
         # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
@@ -3367,6 +3487,14 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
         
     except(NotFound):
         pass
+    
+    df['timeStr'] = pd.to_datetime(df['time'], format='%H:%M:%S').dt.time
+
+    # Define the target 19:00 time
+    target_time = pd.to_datetime('19:00:00', format='%H:%M:%S').time()
+    
+    # Create a new boolean column: True if time >= 19:00, else False
+    df['has_19_passed'] = df['timeStr'] >= target_time
     '''
     df['stillbuy'] = False
     df['stillsell'] = False
@@ -3427,85 +3555,94 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     stillsell = False
     
     for p in range(len(df)):
-        # Initial trade entry conditions (fixed for better execution) not stillsell and
-        if not stillsell and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021)  & (df.at[p, 'smoothed_derivative'] > 0) & ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0))):
-            df.at[p, 'buy_signal'] = True
-            stillbuy = True
-            stillsell = False  
-    #not stillbuy and
-        if not stillbuy and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021) & (df.at[p, 'smoothed_derivative'] < 0) & ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0))):
-            df.at[p, 'sell_signal'] = True
-            stillsell = True
-            stillbuy = False  
-    
-        # Exit condition for stillbuy → Trigger a sell
-        if (
-            stillbuy and 
-            (df.at[p, 'smoothed_1ema'] <= df.at[p, 'POC']) and 
-            (df.at[p, 'POCDistanceEMA'] < -0.048) and 
-            (df.at[p, 'smoothed_derivative'] < 0) and 
-            ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
-            (df.at[p, 'vwap_signalSell']) and
-            (df.at[p, 'uppervwap_signalSell']) and
-            (df.at[p, 'lowervwap_signalSell']) and
-            (df.at[p, 'vwapAvg_signalSell']) 
-        ):
-            df.at[p, 'sell_signal'] = True  # Trigger sell
-            stillbuy = False  # Stop buy tracking
-            stillsell = True  # Start sell tracking
-    
-        # Exit condition for stillsell → Trigger a buy
-        if (
-            stillsell and 
-            (df.at[p, 'smoothed_1ema'] >= df.at[p, 'POC']) and 
-            (df.at[p, 'POCDistanceEMA'] > 0.048) and 
-            (df.at[p, 'smoothed_derivative'] > 0) and 
-            ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
-            (df.at[p, 'vwap_signalBuy']) and
-            (df.at[p, 'uppervwap_signalBuy']) and
-            (df.at[p, 'lowervwap_signalBuy']) and
-            (df.at[p, 'vwapAvg_signalBuy'])
-        ):
-            df.at[p, 'buy_signal'] = True  # Trigger buy
-            stillsell = False  # Stop sell tracking
-            stillbuy = True  # Start buy tracking
-            
-            
-        if (
-            not stillsell and not stillbuy and 
-            (df.at[p, 'smoothed_1ema'] >= df.at[p, 'POC']) and 
-            (df.at[p, 'POCDistanceEMA'] > 0.048) and 
-            (df.at[p, 'smoothed_derivative'] > 0) and 
-            ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
-            (df.at[p, 'vwap_signalBuy']) and
-            (df.at[p, 'uppervwap_signalBuy']) and
-            (df.at[p, 'lowervwap_signalBuy'])and
-            (df.at[p, 'vwapAvg_signalBuy']) 
-        ):
-            df.at[p, 'buy_signal'] = True  # Trigger buy
-            stillsell = False  # Stop sell tracking
-            stillbuy = True  # Start buy tracking
-            
-        if (
-            not stillsell and not stillbuy and 
-            (df.at[p, 'smoothed_1ema'] <= df.at[p, 'POC']) and 
-            (df.at[p, 'POCDistanceEMA'] < -0.048) and 
-            (df.at[p, 'smoothed_derivative'] < 0) and 
-            ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
-            (df.at[p, 'vwap_signalSell']) and
-            (df.at[p, 'uppervwap_signalSell'])and
-            (df.at[p, 'lowervwap_signalSell']) and
-            (df.at[p, 'vwapAvg_signalSell']) 
-        ):
-            df.at[p, 'sell_signal'] = True  # Trigger sell
-            stillbuy = False  # Stop buy tracking
-            stillsell = True  # Start sell tracking
-            
-    
-        # Update tracking columns
-        df.at[p, 'stillbuy'] = stillbuy
-        df.at[p, 'stillsell'] = stillsell
-    
+        if (df.at[p, 'has_19_passed']):
+            # Initial trade entry conditions (fixed for better execution) not stillsell and
+            if not stillsell and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021)  & (df.at[p, 'smoothed_derivative'] > 0) & ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0))):
+                df.at[p, 'buy_signal'] = True
+                stillbuy = True
+                stillsell = False  
+            #not stillbuy and
+            if not stillbuy and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021) & (df.at[p, 'smoothed_derivative'] < 0) & ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0))):
+                df.at[p, 'sell_signal'] = True
+                stillsell = True
+                stillbuy = False  
+        
+            # Exit condition for stillbuy → Trigger a sell
+            if (
+                stillbuy and 
+                (df.at[p, 'smoothed_1ema'] <= df.at[p, 'POC']) and 
+                (df.at[p, 'POCDistanceEMA'] < -0.048) and 
+                (df.at[p, 'smoothed_derivative'] < 0) and 
+                ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
+                (df.at[p, 'vwap_signalSell']) and
+                (df.at[p, 'LVA_signalSell']) and
+                (df.at[p, 'HVA_signalSell'])
+                #(df.at[p, 'uppervwap_signalSell']) and
+                #(df.at[p, 'lowervwap_signalSell']) and
+                #(df.at[p, 'vwapAvg_signalSell']) 
+            ):
+                df.at[p, 'sell_signal'] = True  # Trigger sell
+                stillbuy = False  # Stop buy tracking
+                stillsell = True  # Start sell tracking
+        
+            # Exit condition for stillsell → Trigger a buy
+            if (
+                stillsell and 
+                (df.at[p, 'smoothed_1ema'] >= df.at[p, 'POC']) and 
+                (df.at[p, 'POCDistanceEMA'] > 0.048) and 
+                (df.at[p, 'smoothed_derivative'] > 0) and 
+                ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
+                (df.at[p, 'vwap_signalBuy']) and
+                (df.at[p, 'LVA_signalBuy']) and
+                (df.at[p, 'HVA_signalBuy'])
+                #(df.at[p, 'uppervwap_signalBuy']) and
+                #(df.at[p, 'lowervwap_signalBuy']) and
+                #(df.at[p, 'vwapAvg_signalBuy'])
+            ):
+                df.at[p, 'buy_signal'] = True  # Trigger buy
+                stillsell = False  # Stop sell tracking
+                stillbuy = True  # Start buy tracking
+                
+                
+            if (
+                not stillsell and not stillbuy and 
+                (df.at[p, 'smoothed_1ema'] >= df.at[p, 'POC']) and 
+                (df.at[p, 'POCDistanceEMA'] > 0.048) and 
+                (df.at[p, 'smoothed_derivative'] > 0) and 
+                ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
+                (df.at[p, 'vwap_signalBuy']) and
+                (df.at[p, 'LVA_signalBuy']) and
+                (df.at[p, 'HVA_signalBuy'])
+                #(df.at[p, 'uppervwap_signalBuy']) and
+                #(df.at[p, 'lowervwap_signalBuy'])and
+                #(df.at[p, 'vwapAvg_signalBuy']) 
+            ):
+                df.at[p, 'buy_signal'] = True  # Trigger buy
+                stillsell = False  # Stop sell tracking
+                stillbuy = True  # Start buy tracking
+                
+            if (
+                not stillsell and not stillbuy and 
+                (df.at[p, 'smoothed_1ema'] <= df.at[p, 'POC']) and 
+                (df.at[p, 'POCDistanceEMA'] < -0.048) and 
+                (df.at[p, 'smoothed_derivative'] < 0) and 
+                ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
+                (df.at[p, 'vwap_signalSell']) and
+                (df.at[p, 'LVA_signalSell']) and
+                (df.at[p, 'HVA_signalSell'])
+                #(df.at[p, 'uppervwap_signalSell'])and
+                #(df.at[p, 'lowervwap_signalSell']) and
+                #(df.at[p, 'vwapAvg_signalSell']) 
+            ):
+                df.at[p, 'sell_signal'] = True  # Trigger sell
+                stillbuy = False  # Stop buy tracking
+                stillsell = True  # Start sell tracking
+                
+        
+            # Update tracking columns
+            df.at[p, 'stillbuy'] = stillbuy
+            df.at[p, 'stillsell'] = stillsell
+        
 
 
     #calculate_ttm_squeeze(df)
@@ -3518,9 +3655,10 @@ def update_graph_live(n_intervals, sname, interv, stored_data, previous_stkName,
     if sname != previous_stkName or interv != previous_interv:
         interval_time = initial_inter
         
+    #toggle_value=[]
+    #poly_value=[]
     
-    
-    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterList=cdata, troInterval=stored_data['tro']) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterList=cdata, troInterval=stored_data['tro'], toggle_value=toggle_value, poly_value=poly_value ) #trends=FindTrends(df,n=10)
  
     return stored_data, fg, previous_stkName, previous_interv, interval_time
 
