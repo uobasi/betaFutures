@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Thu Mar 20 00:37:17 2025
+
+@author: UOBASUB
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Sun Feb 16 03:50:19 2025
 
 @author: uobas
@@ -2573,6 +2580,28 @@ def apply_kalman_filter_1(data, transition_covariance, observation_covariance):
     state_means, _ = kf.filter(data)
 
     return np.array(state_means).squeeze()
+
+
+def butter_lowpass_realtime(data, cutoff=0.05, order=2):
+    """
+    Apply a real-time Butterworth low-pass filter to smooth stock prices.
+    Uses lfilter() with proper initial conditions.
+    
+    :param data: List or Pandas Series of stock prices.
+    :param cutoff: Normalized cutoff frequency (0 < cutoff < 1), lower = smoother.
+    :param order: Filter order (higher = sharper cutoff).
+    :return: Smoothed stock price series (real-time compatible).
+    """
+    b, a = signal.butter(order, cutoff, btype='low', analog=False)
+    
+    # Set initial conditions using the first value to avoid starting at zero
+    zi = signal.lfilter_zi(b, a) * data[0]
+    
+    # Apply the filter in a forward-only manner
+    smoothed_data, _ = signal.lfilter(b, a, data, zi=zi)
+    
+    return smoothed_data
+
    
 #symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
 #symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
@@ -3361,7 +3390,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         #df['positive_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x > 0].mean(), raw=False)
         #df['negative_mean'] = df['smoothed_derivative'].expanding().apply(lambda x: x[x < 0].mean(), raw=False)
         
-        df['smoothed_1ema'] = double_exponential_smoothing(df['1ema'], 0.5, 0.01)#apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
+        df['smoothed_1ema'] = butter_lowpass_realtime(df["close"],cutoff=0.5, order=2)
+        #df['smoothed_1ema'] = double_exponential_smoothing(df['1ema'], 0.5, 0.01)#apply_kalman_filter(df['1ema'], transition_covariance=float(curvature), observation_covariance=float(curvatured2))#random_walk_filter(df['1ema'], alpha=alpha)
         #df['smoothed_1ema'] = 0.3 * double_exponential_smoothing_1(df['1ema'], 0.7, 0.01) + \
                          #0.7 * apply_kalman_filter_1(df['1ema'], transition_covariance=float(curvature), 
                          #                          observation_covariance=float(curvatured2))
