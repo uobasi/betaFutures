@@ -1259,9 +1259,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[2])]*len(df['time']) ,
                                     line_color='cyan',
-                                    text = str(previousDay[2]),
+                                    text = 'Previous POC '+str(previousDay[2]),
                                     textposition="bottom left",
-                                    name='Prev POC '+ str(previousDay[2]),
+                                    name=str(previousDay[2]), #'Prev POC '+ 
                                     showlegend=False,
                                     visible=False,
                                     mode= 'lines',
@@ -1275,9 +1275,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[0])]*len(df['time']) ,
                                     line_color='green',
-                                    text = str(previousDay[0]),
+                                    text = 'Previous LVA '+str(previousDay[0]),
                                     textposition="bottom left",
-                                    name='Previous LVA '+ str(previousDay[0]),
+                                    name=str(previousDay[0]),
                                     showlegend=False,
                                     visible=False,
                                     mode= 'lines',
@@ -1289,9 +1289,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[1])]*len(df['time']) ,
                                     line_color='purple',
-                                    text = str(previousDay[1]),
+                                    text = 'Previous HVA '+ str(previousDay[1]),
                                     textposition="bottom left",
-                                    name='Previous HVA '+ str(previousDay[1]),
+                                    name=str(previousDay[1]),
                                     showlegend=False,
                                     visible=False,
                                     mode= 'lines',
@@ -2416,64 +2416,64 @@ def calculate_polyfit_slope_weighted(index, values, window_size):
         return 0.0
 
 def vwapDistanceCheckBuy(df):
-    if abs(df['vwapDistance']) < 0.15:
+    if abs(df['vwapDistance']) < 0.12:
         return df['smoothed_1ema'] > df['vwap']
     return True
 
 def vwapDistanceCheckSell(df):
-    if abs(df['vwapDistance']) < 0.15:#0.25
+    if abs(df['vwapDistance']) < 0.12:#0.25
         return df['smoothed_1ema'] < df['vwap']
     return True
 
 
 def uppervwapDistanceCheckBuy(df):
-    if abs(df['uppervwapDistance']) < 0.15:
+    if abs(df['uppervwapDistance']) < 0.12:
         return df['smoothed_1ema'] > df['uppervwapAvg']
     return True
 
 def uppervwapDistanceCheckSell(df):
-    if abs(df['uppervwapDistance']) < 0.15:
+    if abs(df['uppervwapDistance']) < 0.12:
         return df['smoothed_1ema'] < df['uppervwapAvg']
     return True
 
 def lowervwapDistanceCheckBuy(df):
-    if abs(df['lowervwapDistance']) < 0.15:
+    if abs(df['lowervwapDistance']) < 0.12:
         return df['smoothed_1ema'] > df['lowervwapAvg']
     return True
 
 def lowervwapDistanceCheckSell(df):
-    if abs(df['lowervwapDistance']) < 0.15:
+    if abs(df['lowervwapDistance']) < 0.12:
         return df['smoothed_1ema'] < df['lowervwapAvg'] 
     return True
 
 def vwapAvgDistanceCheckBuy(df):
-    if abs(df['vwapAvgDistance']) < 0.15:
+    if abs(df['vwapAvgDistance']) < 0.12:
         return df['smoothed_1ema'] > df['vwapAvg']
     return True
 
 def vwapAvgDistanceCheckSell(df):
-    if abs(df['vwapAvgDistance']) < 0.15:
+    if abs(df['vwapAvgDistance']) < 0.12:
         return df['smoothed_1ema'] < df['vwapAvg'] 
     return True
 
 def LVADistanceCheckBuy(df):
-    if abs(df['LVADistance']) < 0.15:
+    if abs(df['LVADistance']) < 0.12:
         return df['smoothed_1ema'] > df['LowVA']
     return True
 
 def LVADistanceCheckSell(df):
-    if abs(df['LVADistance']) < 0.15:#0.25
+    if abs(df['LVADistance']) < 0.12:#0.25
         return df['smoothed_1ema'] < df['LowVA']
     return True
 
 
 def HVADistanceCheckBuy(df):
-    if abs(df['HVADistance']) < 0.15:
+    if abs(df['HVADistance']) < 0.12:
         return df['smoothed_1ema'] > df['HighVA']
     return True
 
 def HVADistanceCheckSell(df):
-    if abs(df['HVADistance']) < 0.15:#0.25
+    if abs(df['HVADistance']) < 0.12:#0.25
         return df['smoothed_1ema'] < df['HighVA']
     return True
 
@@ -3470,8 +3470,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         
         
 
-        df['slope_degrees'] = [calculate_slope_rolling(i, df['smoothed_1ema'].values, int(15)) for i in range(len(df))]
-        df['polyfit_slope'] = [calculate_polyfit_slope_rolling(i, df['smoothed_1ema'].values, int(15)) for i in range(len(df))]
+        df['slope_degrees'] = [calculate_slope_rolling(i, df['smoothed_1ema'].values, int(13)) for i in range(len(df))]
+        df['polyfit_slope'] = [calculate_polyfit_slope_rolling(i, df['smoothed_1ema'].values, int(13)) for i in range(len(df))]
         #df['hybrid'] = [calculate_hybrid_slope(i, df['smoothed_1ema'].values, int(30)) for i in range(len(df))]
         
         #slope = str(df['slope_degrees'].iloc[-1]) + ' ' + str(df['polyfit_slope'].iloc[-1])
