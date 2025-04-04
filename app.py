@@ -1756,7 +1756,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     )
     '''
     sorted_list = sorted(clusterList, key=len, reverse=True)
-    for i in sorted_list[:40]:
+    for i in sorted_list[:50]:
     
 
         fig.add_trace(go.Scatter(x=df['time'],
