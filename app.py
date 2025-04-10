@@ -1355,6 +1355,20 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                         )
             trcount+=1
 
+        if (abs(float(previousDay[7]) - df['1ema'][len(df)-1]) / ((float(previousDay[7]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1:
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [float(previousDay[7])]*len(df['time']) ,
+                                    line_color='black',
+                                    text = 'Previous VWAP'+ str(previousDay[7]),
+                                    textposition="bottom left",
+                                    name=str(previousDay[7]),
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ),
+                        )
+            trcount+=1
+
     
     '''
     data =  [i[0] for i in sortadlist] #[i for i in df['close']]
@@ -3389,7 +3403,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                         csv_rows[[i[4] for i in csv_rows].index(symbolNum)][6], 
                         csv_rows[[i[4] for i in csv_rows].index(symbolNum)][7], 
                         csv_rows[[i[4] for i in csv_rows].index(symbolNum)][8],
-                        csv_rows[[i[4] for i in csv_rows].index(symbolNum)][9]]
+                        csv_rows[[i[4] for i in csv_rows].index(symbolNum)][9],
+                        csv_rows[[i[4] for i in csv_rows].index(symbolNum)][10]]
     except(ValueError):
         previousDay = []
     
