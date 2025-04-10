@@ -1299,6 +1299,62 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                         )
             trcount+=1
 
+        if (abs(float(previousDay[3]) - df['1ema'][len(df)-1]) / ((float(previousDay[3]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1:
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [float(previousDay[3])]*len(df['time']) ,
+                                    line_color='black',
+                                    text = 'Previous RTH PDH'+ str(previousDay[3]),
+                                    textposition="bottom left",
+                                    name=str(previousDay[3]),
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ),
+                        )
+            trcount+=1
+
+        if (abs(float(previousDay[4]) - df['1ema'][len(df)-1]) / ((float(previousDay[4]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1:
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [float(previousDay[4])]*len(df['time']) ,
+                                    line_color='black',
+                                    text = 'Previous RTH PDL'+ str(previousDay[4]),
+                                    textposition="bottom left",
+                                    name=str(previousDay[4]),
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ),
+                        )
+            trcount+=1
+
+        if (abs(float(previousDay[5]) - df['1ema'][len(df)-1]) / ((float(previousDay[5]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1:
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [float(previousDay[5])]*len(df['time']) ,
+                                    line_color='black',
+                                    text = 'Previous Globex PDH'+ str(previousDay[5]),
+                                    textposition="bottom left",
+                                    name=str(previousDay[5]),
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ),
+                        )
+            trcount+=1
+
+        if (abs(float(previousDay[6]) - df['1ema'][len(df)-1]) / ((float(previousDay[6]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1:
+            fig.add_trace(go.Scatter(x=df['time'],
+                                    y= [float(previousDay[6])]*len(df['time']) ,
+                                    line_color='black',
+                                    text = 'Previous Globex PDL'+ str(previousDay[6]),
+                                    textposition="bottom left",
+                                    name=str(previousDay[6]),
+                                    showlegend=False,
+                                    visible=False,
+                                    mode= 'lines',
+                                    ),
+                        )
+            trcount+=1
+
     
     '''
     data =  [i[0] for i in sortadlist] #[i for i in df['close']]
@@ -3327,7 +3383,13 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         csv_rows.append(row)
         
     try:   
-        previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0], csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1], csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2]]
+        previousDay = [csv_rows[[i[4] for i in csv_rows].index(symbolNum)][0], 
+                        csv_rows[[i[4] for i in csv_rows].index(symbolNum)][1], 
+                        csv_rows[[i[4] for i in csv_rows].index(symbolNum)][2],
+                        csv_rows[[i[4] for i in csv_rows].index(symbolNum)][6], 
+                        csv_rows[[i[4] for i in csv_rows].index(symbolNum)][7], 
+                        csv_rows[[i[4] for i in csv_rows].index(symbolNum)][8],
+                        csv_rows[[i[4] for i in csv_rows].index(symbolNum)][9]]
     except(ValueError):
         previousDay = []
     
