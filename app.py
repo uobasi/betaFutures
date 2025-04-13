@@ -3547,8 +3547,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         
         
 
-        df['slope_degrees'] = [calculate_slope_rolling(i, df['smoothed_1ema'].values, int(10)) for i in range(len(df))]
-        df['polyfit_slope'] = [calculate_polyfit_slope_rolling(i, df['smoothed_1ema'].values, int(10)) for i in range(len(df))]
+        df['slope_degrees'] = [calculate_slope_rolling(i, df['smoothed_1ema'].values, int(13)) for i in range(len(df))]
+        df['polyfit_slope'] = [calculate_polyfit_slope_rolling(i, df['smoothed_1ema'].values, int(13)) for i in range(len(df))]
         #df['hybrid'] = [calculate_hybrid_slope(i, df['smoothed_1ema'].values, int(30)) for i in range(len(df))]
         
         #slope = str(df['slope_degrees'].iloc[-1]) + ' ' + str(df['polyfit_slope'].iloc[-1])
