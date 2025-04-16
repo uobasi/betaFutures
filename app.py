@@ -1255,7 +1255,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                  )
     '''
     if len(previousDay) > 0:
-        if (abs(float(previousDay[2]) - df['1ema'][len(df)-1]) / ((float(previousDay[2]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 3:
+        if (abs(float(previousDay[2]) - df['1ema'][len(df)-1]) / ((float(previousDay[2]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 2:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[2])]*len(df['time']) ,
                                     line_color='cyan',
@@ -1271,7 +1271,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                         )
             trcount+=1
 
-        if (abs(float(previousDay[0]) - df['1ema'][len(df)-1]) / ((float(previousDay[0]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 3:
+        if (abs(float(previousDay[0]) - df['1ema'][len(df)-1]) / ((float(previousDay[0]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 2:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[0])]*len(df['time']) ,
                                     line_color='green',
@@ -1285,7 +1285,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                         )
             trcount+=1
 
-        if (abs(float(previousDay[1]) - df['1ema'][len(df)-1]) / ((float(previousDay[1]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 3: #0.25
+        if (abs(float(previousDay[1]) - df['1ema'][len(df)-1]) / ((float(previousDay[1]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 2: #0.25
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[1])]*len(df['time']) ,
                                     line_color='purple',
@@ -1299,7 +1299,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                         )
             trcount+=1
 
-        if (abs(float(previousDay[3]) - df['1ema'][len(df)-1]) / ((float(previousDay[3]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 3:
+        if (abs(float(previousDay[3]) - df['1ema'][len(df)-1]) / ((float(previousDay[3]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 2:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[3])]*len(df['time']) ,
                                     line_color='black',
@@ -1313,7 +1313,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                         )
             trcount+=1
 
-        if (abs(float(previousDay[4]) - df['1ema'][len(df)-1]) / ((float(previousDay[4]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 3:
+        if (abs(float(previousDay[4]) - df['1ema'][len(df)-1]) / ((float(previousDay[4]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 2:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[4])]*len(df['time']) ,
                                     line_color='black',
@@ -1327,7 +1327,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                         )
             trcount+=1
 
-        if (abs(float(previousDay[5]) - df['1ema'][len(df)-1]) / ((float(previousDay[5]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 3:
+        if (abs(float(previousDay[5]) - df['1ema'][len(df)-1]) / ((float(previousDay[5]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 2:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[5])]*len(df['time']) ,
                                     line_color='black',
@@ -1341,7 +1341,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                         )
             trcount+=1
 
-        if (abs(float(previousDay[6]) - df['1ema'][len(df)-1]) / ((float(previousDay[6]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 3:
+        if (abs(float(previousDay[6]) - df['1ema'][len(df)-1]) / ((float(previousDay[6]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 2:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[6])]*len(df['time']) ,
                                     line_color='black',
@@ -1355,7 +1355,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                         )
             trcount+=1
 
-        if (abs(float(previousDay[7]) - df['1ema'][len(df)-1]) / ((float(previousDay[7]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 3:
+        if (abs(float(previousDay[7]) - df['1ema'][len(df)-1]) / ((float(previousDay[7]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 2:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[7])]*len(df['time']) ,
                                     line_color='black',
