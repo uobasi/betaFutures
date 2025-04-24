@@ -3686,7 +3686,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
                 (df.at[p, 'vwap_signalSell']) and
                 (df.at[p, 'LVA_signalSell']) and
-                (df.at[p, 'HVA_signalSell'])
+                (df.at[p, 'HVA_signalSell']) and 
+                (abs(df.at[p, 'POCDistanceEMA']) < 0.15) 
                 #(df.at[p, 'uppervwap_signalSell']) and
                 #(df.at[p, 'lowervwap_signalSell']) and
                 #(df.at[p, 'vwapAvg_signalSell']) 
@@ -3704,7 +3705,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
                 (df.at[p, 'vwap_signalBuy']) and
                 (df.at[p, 'LVA_signalBuy']) and
-                (df.at[p, 'HVA_signalBuy'])
+                (df.at[p, 'HVA_signalBuy']) and 
+                (abs(df.at[p, 'POCDistanceEMA']) < 0.15) 
                 #(df.at[p, 'uppervwap_signalBuy']) and
                 #(df.at[p, 'lowervwap_signalBuy']) and
                 #(df.at[p, 'vwapAvg_signalBuy'])
@@ -3722,7 +3724,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
                 (df.at[p, 'vwap_signalBuy']) and
                 (df.at[p, 'LVA_signalBuy']) and
-                (df.at[p, 'HVA_signalBuy'])
+                (df.at[p, 'HVA_signalBuy']) and 
+                (abs(df.at[p, 'POCDistanceEMA']) < 0.15) 
                 #(df.at[p, 'uppervwap_signalBuy']) and
                 #(df.at[p, 'lowervwap_signalBuy'])and
                 #(df.at[p, 'vwapAvg_signalBuy']) 
@@ -3739,7 +3742,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
                 (df.at[p, 'vwap_signalSell']) and
                 (df.at[p, 'LVA_signalSell']) and
-                (df.at[p, 'HVA_signalSell'])
+                (df.at[p, 'HVA_signalSell']) and 
+                (abs(df.at[p, 'POCDistanceEMA']) < 0.15) 
                 #(df.at[p, 'uppervwap_signalSell'])and
                 #(df.at[p, 'lowervwap_signalSell']) and
                 #(df.at[p, 'vwapAvg_signalSell']) 
