@@ -3667,15 +3667,15 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     for p in range(len(df)):
         if df.at[p, 'has_19_occurred']:
             # Initial trade entry conditions (fixed for better execution) not stillsell and
-            if not stillsell and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021)  & (df.at[p, 'smoothed_derivative'] > 0) & ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0))):
-                df.at[p, 'buy_signal'] = True
-                stillbuy = True
-                stillsell = False  
+            #if not stillsell and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021)  & (df.at[p, 'smoothed_derivative'] > 0) & ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0))):
+            #    df.at[p, 'buy_signal'] = True
+            #    stillbuy = True
+            #    stillsell = False  
             #not stillbuy and
-            if not stillbuy and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021) & (df.at[p, 'smoothed_derivative'] < 0) & ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0))):
-                df.at[p, 'sell_signal'] = True
-                stillsell = True
-                stillbuy = False  
+            #if not stillbuy and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021) & (df.at[p, 'smoothed_derivative'] < 0) & ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0))):
+            #    df.at[p, 'sell_signal'] = True
+            #    stillsell = True
+            #    stillbuy = False  
         
             # Exit condition for stillbuy → Trigger a sell
             if (
