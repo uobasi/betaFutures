@@ -3681,7 +3681,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             if (
                 stillbuy and 
                 (df.at[p, 'smoothed_1ema'] <= df.at[p, 'POC']) and 
-                (df.at[p, 'POCDistanceEMA'] < -0.048) and 
+                #(df.at[p, 'POCDistanceEMA'] < -0.048) and 
                 (df.at[p, 'smoothed_derivative'] < 0) and 
                 ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
                 (df.at[p, 'vwap_signalSell']) and
@@ -3700,7 +3700,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             if (
                 stillsell and 
                 (df.at[p, 'smoothed_1ema'] >= df.at[p, 'POC']) and 
-                (df.at[p, 'POCDistanceEMA'] > 0.048) and 
+                #(df.at[p, 'POCDistanceEMA'] > 0.048) and 
                 (df.at[p, 'smoothed_derivative'] > 0) and 
                 ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
                 (df.at[p, 'vwap_signalBuy']) and
@@ -3719,7 +3719,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             if (
                 not stillsell and not stillbuy and 
                 (df.at[p, 'smoothed_1ema'] >= df.at[p, 'POC']) and 
-                (df.at[p, 'POCDistanceEMA'] > 0.048) and 
+                #(df.at[p, 'POCDistanceEMA'] > 0.048) and 
                 (df.at[p, 'smoothed_derivative'] > 0) and 
                 ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
                 (df.at[p, 'vwap_signalBuy']) and
@@ -3737,7 +3737,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             if (
                 not stillsell and not stillbuy and 
                 (df.at[p, 'smoothed_1ema'] <= df.at[p, 'POC']) and 
-                (df.at[p, 'POCDistanceEMA'] < -0.048) and 
+                #(df.at[p, 'POCDistanceEMA'] < -0.048) and 
                 (df.at[p, 'smoothed_derivative'] < 0) and 
                 ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
                 (df.at[p, 'vwap_signalSell']) and
