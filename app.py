@@ -1298,7 +1298,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     ),
                         )
             trcount+=1
-
+        '''
         if (abs(float(previousDay[3]) - df['1ema'][len(df)-1]) / ((float(previousDay[3]) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1.5:
             fig.add_trace(go.Scatter(x=df['time'],
                                     y= [float(previousDay[3])]*len(df['time']) ,
@@ -1368,7 +1368,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     ),
                         )
             trcount+=1
-
+        '''
     
     '''
     data =  [i[0] for i in sortadlist] #[i for i in df['close']]
