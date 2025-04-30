@@ -1448,7 +1448,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                             mode= 'lines',
                             ))
     '''
-    
+    '''
+    1
     if '19:00:00' in df['time'].values or '19:01:00' in df['time'].values:
         if '19:00:00' in df['time'].values:
             opstr = '19:00:00'
@@ -1467,7 +1468,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                 visible=False,
                                 mode= 'lines',
                                 ))
-        '''
+    '''
+    '''
         if '01:00:00' in df['time'].values:
             #fig.add_vline(x=df[df['time'] == '01:00:00'].index[0], line_width=2, line_dash="dash", line_color="red", annotation_text='Sydney Close', annotation_position='top left', row=1, col=1)
             
@@ -1506,9 +1508,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     #visible=False,
                                     #mode= 'lines',
                                     #))
-            '''
+        '''
             
-
+    '''
+    2
         if '03:00:00' in df['time'].values:
             fig.add_vline(x=df[df['time'] == '03:00:00'].index[0], line_width=1, line_dash="dash", line_color="green", annotation_text='London Open', annotation_position='top left', row=1, col=1)
             
@@ -1620,6 +1623,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     #visible=False,
                                     #mode= 'lines',
                                     #)) 
+    '''
 
     '''      
     if '02:00:00' in df['time'].values:
