@@ -1037,8 +1037,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                 pass
         
         OptionTimeFrame[ctn].append(mks + tpStrings)
-        OptionTimeFrame[ctn].append([tobuyss,round(tobuyss/(tobuyss+tosellss),2),tosellss,round(tosellss/(tobuyss+tosellss),2)])
-        #textPerCandle.append([ctn,mks + tpStrings])
+        try:
+            OptionTimeFrame[ctn].append([tobuyss,round(tobuyss/(tobuyss+tosellss),2),tosellss,round(tosellss/(tobuyss+tosellss),2)])
+        except(ZeroDivisionError):
+            OptionTimeFrame[ctn].append([tobuyss,tobuyss,tosellss,tosellss])
         ctn+=1
         
     putCand = [i for i in OptionTimeFrame if int(i[2]) > int(i[3]) if int(i[4]) < len(df)] # if int(i[4]) < len(df)
