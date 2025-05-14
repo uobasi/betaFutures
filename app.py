@@ -3457,7 +3457,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             trades_in_window = all_trades_np[start_idx:end_idx]
         
             # Get top 200 trades by quantity
-            top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-200:].tolist()
+            top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-100:].tolist()
         
             # Filter trades for the current candle interval
             lower_bound = make[it - 1][0]
@@ -3484,7 +3484,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         
         # Use all trades from the beginning of the day
         trades_in_window = all_trades_np[0:]
-        top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-200:].tolist()
+        top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-100:].tolist()
         
         # Only filter for trades **after the final_start**
         filtered_orders = [order for order in top_trades if order[2] >= final_start]
