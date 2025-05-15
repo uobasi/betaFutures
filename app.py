@@ -44,7 +44,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 np.seterr(divide='ignore', invalid='ignore')
 pd.options.mode.chained_assignment = None
-from scipy.signal import argrelextrema
+#from scipy.signal import argrelextrema
 from scipy import signal
 from scipy.misc import derivative
 from scipy.interpolate import interp1d
@@ -55,12 +55,12 @@ import plotly.io as pio
 pio.renderers.default='browser'
 import bisect
 from collections import defaultdict
-from scipy.signal import savgol_filter
+#from scipy.signal import savgol_filter
 from scipy.stats import linregress
-from scipy.ndimage import gaussian_filter1d
+#from scipy.ndimage import gaussian_filter1d
 from numpy.polynomial import Polynomial
 from scipy.stats import percentileofscore
-from collections import Counter
+#from collections import Counter
 #import yfinance as yf
 #import dateutil.parser
 
@@ -652,9 +652,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     tobuys =  sum([x[1] for x in [i for i in sortadlist if i[3] == 'B']])
     tosells = sum([x[1] for x in [i for i in sortadlist if i[3] == 'A']])
     
-    ratio = str(round(max(tosells,tobuys)/min(tosells,tobuys),3))
+    #ratio = str(round(max(tosells,tobuys)/min(tosells,tobuys),3))
     # Ratio : '+str(ratio)+' ' 
-    tpString = ' (Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+') | '+ '(Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+'))'
+    tpString = ' (Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+') | '+ '(Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+'))' + df['vpShape'].iloc[-1] + ' ' + str(df['vpShapeConfidence'].iloc[-1])
     
     '''
     putDec = 0
@@ -2168,41 +2168,6 @@ def least_squares_filter(data, window_size, poly_order=2):
     return pd.Series(filtered_data, index=data.index)
 
 
-def least_squares_filter_real_time(data, window_size, poly_order=2):
-    filtered_data = []
-
-    for i in range(len(data)):
-        start = max(0, i - window_size + 1)
-        window_data = data[start:i + 1]
-        x = np.arange(len(window_data))
-
-        try:
-            # Fit a polynomial to the trailing window
-            coefficients = np.polyfit(x, window_data, poly_order)
-            poly_func = np.poly1d(coefficients)
-            filtered_value = poly_func(len(window_data) - 1)
-        except np.linalg.LinAlgError:
-            # Handle the error by falling back to a simple estimate
-            filtered_value = window_data.iloc[-1]  # or use np.mean(window_data)
-
-        filtered_data.append(filtered_value)
-
-    return pd.Series(filtered_data, index=data.index)
-
-
-def ewm_median(series, span):
-    alpha = 2 / (span + 1)  # Exponential smoothing parameter
-    weights = (1 - alpha) ** np.arange(len(series))[::-1]  # Reverse weights
-    medians = []
-    
-    for i in range(len(series)):
-        current_window = series.iloc[max(0, i - span + 1):i + 1]
-        weighted_values = current_window * weights[-len(current_window):]
-        weighted_values = weighted_values.dropna()
-        medians.append(np.median(weighted_values))
-    
-    return pd.Series(medians, index=series.index)
-
 
 from concurrent.futures import ThreadPoolExecutor    
 def download_data(bucket_name, blob_name):
@@ -2223,161 +2188,7 @@ def download_daily_data(bucket, stkName):
     
     return prevDf
 
-def exponential_median(data, span):
-    alpha = 2 / (span + 1)
-    exp_median = []
-    median_val = data[0]  # Initialize with the first value
-    
-    for val in data:
-        median_val = (1 - alpha) * median_val + alpha * val
-        exp_median.append(median_val)
-    
-    return exp_median
 
-
-def mean_shift_filter(data, bandwidth, max_iterations=10, tolerance=1e-4):
-    """
-    Apply a mean shift filter to reduce noise in time series data.
-
-    Parameters:
-    - data: pd.Series - Input time series data (e.g., '1ema').
-    - bandwidth: float - Size of the neighborhood for mean calculation.
-    - max_iterations: int - Maximum number of iterations for the mean shift.
-    - tolerance: float - Convergence tolerance for stopping the iterations.
-
-    Returns:
-    - pd.Series - Smoothed data.
-    """
-    smoothed = data.copy()
-    for iteration in range(max_iterations):
-        shifted = smoothed.copy()
-        for i in range(len(data)):
-            # Determine the neighborhood
-            start = max(0, i - bandwidth)
-            end = min(len(data), i + bandwidth)
-            # Update value based on the mean of the neighborhood
-            shifted.iloc[i] = smoothed.iloc[start:end].mean()
-        
-        # Check for convergence
-        if np.abs(shifted - smoothed).max() < tolerance:
-            break
-        smoothed = shifted
-
-    return smoothed
-
-
-def mean_shift_filter_realtime(data, bandwidth, max_iterations=5, tolerance=1e-4):
-    """
-    Real-time Mean Shift Filter to smooth time series without relying on future data.
-
-    Parameters:
-    - data: pd.Series - Input time series data (e.g., '1ema').
-    - bandwidth: int - Number of past points to consider for smoothing.
-    - max_iterations: int - Maximum iterations for the mean shift process.
-    - tolerance: float - Convergence tolerance for stopping the iterations.
-
-    Returns:
-    - pd.Series - Smoothed data.
-    """
-    smoothed = data.copy()
-    for iteration in range(max_iterations):
-        shifted = smoothed.copy()
-        for i in range(len(data)):
-            # Use only past and current points within the bandwidth
-            start = max(0, i - bandwidth)
-            window = smoothed.iloc[start:i + 1]  # Causal window
-            # Update the current point based on the mean of the causal window
-            shifted.iloc[i] = window.mean()
-        
-        # Check for convergence
-        if np.abs(shifted - smoothed).max() < tolerance:
-            break
-        smoothed = shifted
-
-    return smoothed
-
-'''
-#from sklearn.linear_model import LinearRegression
-def linear_regression_smoothing(data, window_size):
-    """
-    Smooth a line using linear regression over a sliding window.
-    
-    Parameters:
-    - data: pd.Series - The input data series.
-    - window_size: int - The size of the sliding window.
-    
-    Returns:
-    - pd.Series - Smoothed data.
-    """
-    smoothed = []
-    half_window = window_size // 2
-    
-    for i in range(len(data)):
-        # Define the window boundaries
-        start = max(0, i - window_size + 1)
-        end = min(len(data), i + half_window + 1)     
-                               
-        # Extract the windowed data
-        x = np.arange(start, end).reshape(-1, 1)
-        y = data[start:end].values
-        
-        # Fit linear regression
-        model = LinearRegression()
-        model.fit(x, y)
-        
-        # Predict the value at the current index
-        smoothed_value = model.predict([[i]])
-        smoothed.append(smoothed_value[0])
-    
-    return pd.Series(smoothed, index=data.index)
-'''
-def random_walk_filter(data, alpha=0.5):
-    """
-    Apply a Random Walk Filter to smooth the data.
-
-    Parameters:
-    - data: pandas Series or numpy array of the original time-series data.
-    - alpha: Smoothing factor, between 0 and 1.
-
-    Returns:
-    - Smoothed data as a pandas Series (if input is a pandas Series).
-    """
-    smoothed = np.zeros_like(data)
-    smoothed[0] = data[0]  # Initialize with the first data point
-
-    for t in range(1, len(data)):
-        # Update rule for the random walk filter
-        smoothed[t] = alpha * data[t] + (1 - alpha) * smoothed[t - 1]
-    
-    return pd.Series(smoothed, index=data.index) if isinstance(data, pd.Series) else smoothed
-
-from pykalman import KalmanFilter
-
-# Function to apply the Kalman filter
-def apply_kalman_filter(data, transition_covariance, observation_covariance):
-    """
-    Applies Kalman Filter to smooth a time-series dataset.
-
-    Parameters:
-    - data (array-like): Time series to be smoothed (e.g., EMA or price).
-
-    Returns:
-    - np.array: Smoothed time series.
-    """
-    # Initialize the Kalman Filter
-    kf = KalmanFilter(
-        transition_matrices=[1],  # State transition matrix
-        observation_matrices=[1],  # Observation matrix
-        initial_state_mean=data[0],  # Initial state estimate
-        initial_state_covariance=1,  # Initial covariance estimate
-        observation_covariance=observation_covariance,  # Measurement noise covariance
-        transition_covariance=transition_covariance  # Process noise covariance
-    )
-
-    # Use the Kalman filter to estimate the state
-    state_means, _ = kf.filter(data)
-
-    return state_means
 
 def calculate_rsi(data, window=14):
     """
@@ -2644,39 +2455,7 @@ def double_exponential_smoothing_1(X, alpha, beta):
 
     return np.array(S).squeeze()
 
-def apply_kalman_filter_1(data, transition_covariance, observation_covariance):
-    """
-    Applies Kalman Filter to smooth a time-series dataset.
 
-    Parameters:
-    - data (array-like): Time series to be smoothed (e.g., EMA or price).
-    - transition_covariance (float): Process noise covariance.
-    - observation_covariance (float): Measurement noise covariance.
-
-    Returns:
-    - np.array: Smoothed 1D time series.
-    """
-    # Ensure input is a 1D NumPy array
-    data = np.asarray(data).squeeze()
-
-    # Handle edge case where data length is too short
-    if len(data) < 2:
-        raise ValueError("Input data must have at least two points.")
-
-    # Initialize the Kalman Filter
-    kf = KalmanFilter(
-        transition_matrices=[1],  # State transition matrix
-        observation_matrices=[1],  # Observation matrix
-        initial_state_mean=data[0],  # Initial state estimate
-        initial_state_covariance=1,  # Initial covariance estimate
-        observation_covariance=observation_covariance,  # Measurement noise covariance
-        transition_covariance=transition_covariance  # Process noise covariance
-    )
-
-    # Use the Kalman filter to estimate the state
-    state_means, _ = kf.filter(data)
-
-    return np.array(state_means).squeeze()
 
 
 def butter_lowpass_realtime(data, cutoff=0.05, order=2):
@@ -2699,7 +2478,194 @@ def butter_lowpass_realtime(data, cutoff=0.05, order=2):
     
     return smoothed_data
 
-   
+
+def detect_volume_profile_shape_1(volume_profile):
+    """
+    Detect the shape of a volume profile (D-shaped, P-shaped, b-shaped, or B-shaped)
+    
+    Args:
+        volume_profile: List of lists where each sublist contains [price_start, volume, index, price_end]
+    
+    Returns:
+        Dictionary with shape classification and confidence scores
+    """
+    
+    # Extract volumes and normalize them
+    volumes = np.array([row[1] for row in volume_profile])
+    normalized_volumes = volumes / np.max(volumes)
+    
+    # Find the Point of Control (POC) - the price level with highest volume
+    poc_index = np.argmax(volumes)
+    poc_position = poc_index / len(volumes)  # Normalized position (0-1)
+    
+    # Calculate volume distributions in different thirds
+    third_size = len(volumes) // 3
+    
+    # Bottom third (lower prices)
+    bottom_volumes = volumes[:third_size]
+    bottom_avg = np.mean(bottom_volumes)
+    
+    # Middle third
+    middle_volumes = volumes[third_size:2*third_size]
+    middle_avg = np.mean(middle_volumes)
+    
+    # Top third (higher prices)
+    top_volumes = volumes[2*third_size:]
+    top_avg = np.mean(top_volumes)
+    
+    # Calculate volume concentration ratios
+    total_volume = np.sum(volumes)
+    bottom_ratio = np.sum(bottom_volumes) / total_volume
+    middle_ratio = np.sum(middle_volumes) / total_volume
+    top_ratio = np.sum(top_volumes) / total_volume
+    
+    # Calculate asymmetry metrics
+    # Measure how volume is distributed relative to POC
+    volumes_below_poc = volumes[:poc_index] if poc_index > 0 else np.array([])
+    volumes_above_poc = volumes[poc_index+1:] if poc_index < len(volumes)-1 else np.array([])
+    
+    below_poc_volume = np.sum(volumes_below_poc)
+    above_poc_volume = np.sum(volumes_above_poc)
+    
+    # Asymmetry ratio (positive = more volume above POC, negative = more below POC)
+    asymmetry = (above_poc_volume - below_poc_volume) / total_volume
+    
+    # Calculate tail characteristics
+    # Look for rapid volume decrease from POC
+    
+    # Check volume decline rate from POC upward
+    upper_tail_ratio = 0
+    if poc_index < len(volumes) - 1:
+        volumes_above = volumes[poc_index+1:]
+        if len(volumes_above) > 0:
+            # Calculate how quickly volume drops off above POC
+            weighted_decline = 0
+            for i, vol in enumerate(volumes_above[:min(5, len(volumes_above))]):
+                weight = 1 / (i + 1)  # Give more weight to volumes closer to POC
+                normalized_vol = vol / volumes[poc_index]
+                weighted_decline += weight * (1 - normalized_vol)
+            upper_tail_ratio = weighted_decline / sum(1/(i+1) for i in range(min(5, len(volumes_above))))
+    
+    # Check volume decline rate from POC downward
+    lower_tail_ratio = 0
+    if poc_index > 0:
+        volumes_below = volumes[:poc_index][::-1]  # Reverse to start from POC
+        if len(volumes_below) > 0:
+            weighted_decline = 0
+            for i, vol in enumerate(volumes_below[:min(5, len(volumes_below))]):
+                weight = 1 / (i + 1)
+                normalized_vol = vol / volumes[poc_index]
+                weighted_decline += weight * (1 - normalized_vol)
+            lower_tail_ratio = weighted_decline / sum(1/(i+1) for i in range(min(5, len(volumes_below))))
+    
+    # Classification logic
+    scores = {
+        'D-shaped': 0,
+        'P-shaped': 0,
+        'b-shaped': 0,
+        'B-shaped': 0
+    }
+    
+    # Check volume spread around POC for D-shape detection
+    # A D-shape should have significant volume distributed around the POC
+    volume_around_poc_ratio = 0
+    poc_window = max(5, len(volumes) // 10)  # Window around POC
+    start_idx = max(0, poc_index - poc_window//2)
+    end_idx = min(len(volumes), poc_index + poc_window//2 + 1)
+    volume_around_poc = np.sum(volumes[start_idx:end_idx])
+    volume_around_poc_ratio = volume_around_poc / total_volume
+    
+    # D-shaped: POC can be anywhere, but volume should be well distributed around it
+    # Key characteristic: gradual decline in both directions from POC area
+    # More flexible POC position and asymmetry thresholds
+    if 0.2 < poc_position < 0.8:  # More flexible POC position
+        scores['D-shaped'] += 0.3
+        
+        # Check for good volume distribution around POC
+        if volume_around_poc_ratio > 0.4:  # Significant volume around POC
+            scores['D-shaped'] += 0.2
+        
+        # Check for balanced decline (not too steep on either side)
+        if upper_tail_ratio < 0.8 and lower_tail_ratio < 0.8:
+            scores['D-shaped'] += 0.2
+        
+        # Allow for some asymmetry (less strict than before)
+        if abs(asymmetry) < 0.3:  # More lenient asymmetry threshold
+            scores['D-shaped'] += 0.2
+        
+        # Check that no single third dominates completely
+        all_ratios = [bottom_ratio, middle_ratio, top_ratio]
+        max_ratio = max(all_ratios)
+        if max_ratio < 0.6:  # No single third has more than 60% of volume
+            scores['D-shaped'] += 0.1
+    
+    # P-shaped: POC near top, steep decline below, minimal volume above
+    if poc_position > 0.6 and asymmetry < -0.1:
+        scores['P-shaped'] += 0.4
+        # Check for steep decline below POC
+        if lower_tail_ratio > 0.6:
+            scores['P-shaped'] += 0.3
+        # More volume concentrated in top third
+        if top_ratio > 0.4 and bottom_ratio < 0.3:
+            scores['P-shaped'] += 0.3
+    
+    # b-shaped: POC near bottom, steep decline above, minimal volume below
+    if poc_position < 0.4 and asymmetry > 0.1:
+        scores['b-shaped'] += 0.4
+        # Check for steep decline above POC
+        if upper_tail_ratio > 0.6:
+            scores['b-shaped'] += 0.3
+        # More volume concentrated in bottom third
+        if bottom_ratio > 0.4 and top_ratio < 0.3:
+            scores['b-shaped'] += 0.3
+    
+    # B-shaped: High volume at both ends, lower in middle (double peaks)
+    # Check for two distinct peaks
+    from scipy.signal import find_peaks
+    peaks, _ = find_peaks(normalized_volumes, height=0.3, distance=len(volumes)//10)
+    
+    if len(peaks) >= 2:
+        peak_positions = peaks / len(volumes)
+        # Check if peaks are near top and bottom
+        if peak_positions[0] < 0.4 and peak_positions[-1] > 0.6:
+            scores['B-shaped'] += 0.4
+            # Check if middle has lower volume
+            if middle_ratio < 0.3:
+                scores['B-shaped'] += 0.3
+        # Alternative: high volume at extremes
+        elif (bottom_ratio > 0.3 and top_ratio > 0.3 and 
+              middle_ratio < max(bottom_ratio, top_ratio)):
+            scores['B-shaped'] += 0.3
+    
+    # Find the shape with highest score
+    detected_shape = max(scores.items(), key=lambda x: x[1])
+    
+    # Additional metrics for analysis
+    metrics = {
+        'poc_position': poc_position,
+        'poc_price': volume_profile[poc_index][0],
+        'asymmetry': asymmetry,
+        'volume_ratios': {
+            'bottom_third': bottom_ratio,
+            'middle_third': middle_ratio,
+            'top_third': top_ratio
+        },
+        'tail_ratios': {
+            'upper': upper_tail_ratio,
+            'lower': lower_tail_ratio
+        },
+        'total_volume': total_volume,
+        'confidence': detected_shape[1]
+    }
+    
+    return {
+        'shape': detected_shape[0],
+        'confidence': detected_shape[1],
+        'all_scores': scores,
+        'metrics': metrics
+    }
+
+
 #symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
 #symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
 
@@ -2718,50 +2684,7 @@ covarianceList = [str(round(i, 2)) for i in [x * 0.01 for x in range(1, 1000)]]
 gclient = storage.Client(project="stockapp-401615")
 bucket = gclient.get_bucket("stockapp-storage")
 
-'''
-styles = {
-    'main_container': {
-        'display': 'flex',
-        'flexDirection': 'row',  # Align items in a row
-        'justifyContent': 'space-around',  # Space between items
-        'flexWrap': 'wrap',  # Wrap items if screen is too small
-        #'marginTop': '20px',
-        'background': '#E5ECF6',  # Soft light blue background
-        'padding': '20px',
-        #'borderRadius': '10px'  # Optional: adds rounded corners for better aesthetics
-    },
-    'sub_container': {
-        'display': 'flex',
-        'flexDirection': 'column',  # Align items in a column within each sub container
-        'alignItems': 'center',
-        'margin': '10px'
-    },
-    'input': {
-        'width': '150px',
-        'height': '35px',
-        'marginBottom': '10px',
-        'borderRadius': '5px',
-        'border': '1px solid #ddd',
-        'padding': '0 10px'
-    },
-    'button': {
-        'width': '100px',
-        'height': '35px',
-        'borderRadius': '10px',
-        'border': 'none',
-        'color': 'white',
-        'background': '#333333',  # Changed to a darker blue color
-        'cursor': 'pointer'
-    },
-    'label': {
-        'textAlign': 'center'
-    }
-}
-'''
 
-#import pandas_ta as ta
-#from collections import Counter
-#from filterpy.kalman import KalmanFilter
 from google.api_core.exceptions import NotFound
 #from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
@@ -2899,9 +2822,9 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         
     tpoNum = '500'
 
-    curvature = '0.6'
+    #curvature = '0.6'
     
-    curvatured2 = '0.7'
+    #curvatured2 = '0.7'
 
     
         
@@ -2924,54 +2847,13 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             #executor.submit(download_daily_data, bucket, stkName)]
         
         FuturesOHLC, FuturesTrades = [future.result() for future in futures] #, prevDf
-        '''
-        else:
-            # Skip daily data when stock name is unchanged
-            futures = [
-                executor.submit(download_data, bucket, 'FuturesOHLC' + str(symbolNum)),
-                executor.submit(download_data, bucket, 'FuturesTrades' + str(symbolNum))]
-            
-            FuturesOHLC, FuturesTrades = [future.result() for future in futures]
-            prevDf = None  # No new daily data download
-        '''
+
     
     # Process data with pandas directly
     FuturesOHLC = pd.read_csv(io.StringIO(FuturesOHLC), header=None)
     FuturesTrades = pd.read_csv(io.StringIO(FuturesTrades), header=None)
     
-    '''
-    blob = Blob('FuturesOHLC'+str(symbolNum), bucket) 
-    FuturesOHLC = blob.download_as_text()
-        
 
-    csv_reader  = csv.reader(io.StringIO(FuturesOHLC))
-    
-    csv_rows = []
-    for row in csv_reader:
-        csv_rows.append(row)
-        
-    
-    newOHLC = [i for i in csv_rows]
-     
-    
-    aggs = [ ] 
-    for i in FuturesOHLC.values.tolist():
-        hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
-        if hourss < 10:
-            hourss = '0'+str(hourss)
-        minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
-        if minss < 10:
-            minss = '0'+str(minss)
-        opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
-        aggs.append([int(i[2])/1e9, int(i[3])/1e9, int(i[4])/1e9, int(i[5])/1e9, int(i[6]), opttimeStamp, int(i[0]), int(i[1])])
-        
-            
-    newAggs = []
-    for i in aggs:
-        if i not in newAggs:
-            newAggs.append(i)
-    
-    '''
     aggs = [ ] 
     for row in FuturesOHLC.itertuples(index=False):
         # Extract values from the row, where row[0] corresponds to the first column, row[1] to the second, etc.
@@ -3027,48 +2909,6 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     df['lowervwapAvg'] = df['STDEV_N25'].cumsum() / (df.index + 1)
     df['vwapAvg'] = df['vwap'].cumsum() / (df.index + 1)
     
-    '''
-    # Apply TEMA calculation to the DataFrame
-    if prevDf is not None:
-        columns_to_keep = ['open', 'high', 'low', 'close', 'volume']
-        prevDf_filtered = prevDf[columns_to_keep]
-        #df_filtered = df[columns_to_keep]
-        
-        # Combine the two DataFrames row-wise
-        #combined_df = pd.concat([prevDf_filtered, df_filtered], ignore_index=True)
-        
-        #vwapCum(combined_df)
-        #PPPCum(combined_df)    
-    '''
-
-    '''
-    blob = Blob('FuturesTrades'+str(symbolNum), bucket) 
-    FuturesTrades = blob.download_as_text()
-    
-    
-    csv_reader  = csv.reader(io.StringIO(FuturesTrades))
-    
-    csv_rows = []
-    for row in csv_reader:
-        csv_rows.append(row)
-       
-
-    #STrades = [i for i in csv_rows]
-    start_time_itertuples = time.time()
-    AllTrades = []
-    for i in FuturesTrades.values.tolist():
-        hourss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).hour
-        if hourss < 10:
-            hourss = '0'+str(hourss)
-        minss = datetime.fromtimestamp(int(int(i[0])// 1000000000)).minute
-        if minss < 10:
-            minss = '0'+str(minss)
-        opttimeStamp = str(hourss) + ':' + str(minss) + ':00'
-        AllTrades.append([int(i[1])/1e9, int(i[2]), int(i[0]), 0, i[3], opttimeStamp])
-    time_itertuples = time.time() - start_time_itertuples
-       
-    #AllTrades = [i for i in AllTrades if i[1] > 1]
-    '''
 
     AllTrades = []
     for row in FuturesTrades.itertuples(index=False):
@@ -3108,86 +2948,11 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     #df['derivative'] = df['derivative'].ewm(span=int(4), adjust=False).mean()
     #df['derivative'] = np.gradient(df[clustNum+'ema'])
     
-    #df['avg_price'] = (df['open'] + df['high'] + df['low'] + df['close']) / 4
-
-    
-    
-    '''
-    
-    
-    
-    kf = KalmanFilter(dim_x=3, dim_z=1)
-
-    # State transition matrix (F) for position, velocity, and acceleration
-    dt = 1  # Time step
-    kf.F = np.array([[1, dt, 0.5 * dt**2],
-                     [0, 1, dt],
-                     [0, 0, 1]])
-    
-    # Measurement function (H): We only observe the position (30 EMA)
-    kf.H = np.array([[1, 0, 0]])
-    
-    # Covariance matrix (P): Initial uncertainty in the estimates
-    kf.P *= 1000  # High initial uncertainty in all states
-    
-    # Measurement noise (R): Uncertainty in observations
-    kf.R = np.array([[5]])
-    
-    # Process noise (Q): Uncertainty in the model dynamics
-    kf.Q = np.array([[0.1, 0, 0],
-                     [0, 0.1, 0],
-                     [0, 0, 0.1]])
-    
-    # Initial state estimate: [position, velocity, acceleration]
-    kf.x = np.array([[df[clustNum+'ema'].iloc[0]], [0], [0]])  # Start with initial position, zero velocity, and zero acceleration
-    
-    # Lists to store the estimates
-    positions = []
-    velocities = []
-    accelerations = []
-    
-    # Iterate over each data point in '30ema'
-    for emaa in df[clustNum+'ema']:
-        kf.predict()  # Predict next state
-        kf.update([emaa])  # Update state with new measurement (position)
-        
-        # Store the estimated position, velocity, and acceleration
-        positions.append(kf.x[0][0])  # Position estimate (smoothed 30 EMA)
-        velocities.append(kf.x[1][0])  # Velocity (first derivative) estimate
-        accelerations.append(kf.x[2][0])  # Acceleration (second derivative) estimate
-    
-    # Add the estimates to the DataFrame
-    df['kalman_position'] = positions
-    df['kalman_velocity'] = velocities
-    df['kalman_acceleration'] = accelerations
-    
-    df['kalman_velocity'] = df['kalman_velocity'].ewm(span=1, adjust=False).mean()
-    '''
-    
-    '''
-    order = 1     # Filter order
-    cutoff = 0.04  # Cutoff frequency, adjust based on desired smoothness
-    
-    # Design a low-pass Butterworth filter
-    b, a = butter(N=order, Wn=cutoff, btype='low')
-    
-    # Apply the filtfilt filter to df['30ema']
-    df['filtfilt'] = filtfilt(b, a, df['close'])
-    #df['lfilter'] = lfilter(b, a, df['close'])
-    
-    from scipy.signal import lfilter_zi
-
-    # Get initial conditions for the filter
-    zi = lfilter_zi(b, a) * df['close'].iloc[0]  # Scale initial conditions to match data
-    
-    # Apply lfilter with the initialized conditions
-    df['lfilter'], _ = lfilter(b, a, df['close'], zi=zi)
-    '''
-
-    window_size = 3  # Define the window size
-    poly_order = 1   # Polynomial order (e.g., 2 for quadratic fit)
+ 
+    #window_size = 3  # Define the window size
+    #poly_order = 1   # Polynomial order (e.g., 2 for quadratic fit)
     #df['lsfreal_time'] = least_squares_filter_real_time(df['close'], window_size, poly_order)
-    df['lsf'] = least_squares_filter(df['close'], window_size, poly_order)
+    #df['lsf'] = least_squares_filter(df['close'], window_size, poly_order)
     #df['lsf'] = df['lsf'].ewm(span=int(1), adjust=False).mean()
     
     #df['lsfreal_time'] = df['lsfreal_time'].ewm(span=1, adjust=False).mean()
@@ -3300,6 +3065,30 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             
         newst = [[stored_data['tro'][i][0], stored_data['tro'][i][1], bolist[i], stored_data['tro'][i][3], solist[i], stored_data['tro'][i][5], stored_data['tro'][i][6]] for i in range(len(stored_data['tro']))]
         stored_data['tro'] = newst
+        
+        vpShape = []
+        for it in range(len(make)):
+            if it+1 < len(make):
+                tempList = AllTrades[0:make[it+1][2]]
+            else:
+                tempList = AllTrades
+            
+            temphs = historV1(df[:it+1],int(tpoNum),{}, tempList, [])
+            vppp = []
+            cct = 0
+            for i in temphs[0]:
+                vppp.append([i[0], i[1], cct, i[3]])
+                cct+=1
+
+
+            result = detect_volume_profile_shape_1(vppp)
+            vpShape.append([result['shape'], result['confidence']])
+            
+        stored_data['vpShape'] = stored_data['vpShape'][:len(stored_data['vpShape'])-1] + vpShape
+            
+        df['vpShape'] = pd.Series([i[0] for i in stored_data['vpShape']])
+        df['vpShapeConfidence'] = pd.Series([i[1] for i in stored_data['vpShape']])
+        
         
         all_trades_np = np.array(AllTrades, dtype=object)
         top100perCandle = []
@@ -3446,6 +3235,28 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             
         dst = [[bful[row][0], bful[row][1], bolist[row], bful[row][2], solist[row], bful[row][3], bful[row][4]] for row in  range(len(bful))]
         
+        vpShape = []
+        for it in range(len(make)):
+            if it+1 < len(make):
+                tempList = AllTrades[0:make[it+1][2]]
+            else:
+                tempList = AllTrades
+            
+            temphs = historV1(df[:it+1],int(tpoNum),{}, tempList, [])
+            vppp = []
+            cct = 0
+            for i in temphs[0]:
+                vppp.append([i[0], i[1], cct, i[3]])
+                cct+=1
+
+
+            result = detect_volume_profile_shape_1(vppp)
+            vpShape.append([result['shape'], result['confidence']])
+            
+            
+        df['vpShape'] = pd.Series([i[0] for i in vpShape])
+        df['vpShapeConfidence'] = pd.Series([i[1] for i in vpShape])
+
             
         all_trades_np = np.array(AllTrades, dtype=object)
         top100perCandle = []
@@ -3457,7 +3268,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             trades_in_window = all_trades_np[start_idx:end_idx]
         
             # Get top 200 trades by quantity
-            top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-100:].tolist()
+            top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-200:].tolist()
         
             # Filter trades for the current candle interval
             lower_bound = make[it - 1][0]
@@ -3484,7 +3295,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         
         # Use all trades from the beginning of the day
         trades_in_window = all_trades_np[0:]
-        top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-100:].tolist()
+        top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-200:].tolist()
         
         # Only filter for trades **after the final_start**
         filtered_orders = [order for order in top_trades if order[2] >= final_start]
@@ -3517,7 +3328,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         top100perCandle_diff = [i[3] for i in top100perCandle]
         df['topDiffOverallInCandle'] = top100perCandle_diff + [np.nan] * (len(df) - len(top100perCandle_diff))
             
-        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist, 'troPerCandle':troPerCandle, 'top100perCandle' : top100perCandle} 
+        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist, 'troPerCandle':troPerCandle, 'top100perCandle' : top100perCandle, 'vpShape':vpShape} 
         
     
     
@@ -3952,3 +3763,27 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
 if __name__ == '__main__':
     app.run_server(debug=False, host='0.0.0.0', port=8080)
     #app.run_server(debug=False, use_reloader=False)
+    
+'''
+hs = historV1(df,int(100),{},AllTrades,[])    
+vppp = []
+cct = 0
+for i in hs[0]:
+    vppp.append([i[0], i[1], cct, i[3]])
+    cct+=1
+    
+    
+result = detect_volume_profile_shape_1(vppp)
+print("Detection Results:")
+print(f"Shape: {result['shape']}")
+print(f"Confidence: {result['confidence']:.3f}")
+print("\nAll Scores:")
+for shape, score in result['all_scores'].items():
+    print(f"  {shape}: {score:.3f}")
+print(f"\nPOC Position: {result['metrics']['poc_position']:.3f}")
+print(f"POC Price: {result['metrics']['poc_price']:.1f}")
+print(f"Asymmetry: {result['metrics']['asymmetry']:.3f}")
+
+# Visualize the result
+visualize_volume_profile(vppp, result)    
+'''
