@@ -1880,47 +1880,48 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
 
     '''
     #mazz = sum(cluster[1] for cluster in cdata) / len(cdata)
-    volumes = [cluster[1] for cluster in clusterList]
-    mazz = np.percentile(volumes, 65) 
-    max_volume = max(cluster[1] for cluster in clusterList if cluster[1] > mazz)
-    
-    for cluster in clusterList:
-        if cluster[1] > mazz:
-            #for i in cluster[0]:
-            maxNum = max([i[0] for i in cluster[0]])
-            minNum = min([i[0] for i in cluster[0]]) 
-            if (abs(float(maxNum) - df['1ema'][len(df)-1]) / ((float(maxNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1.5 or (abs(float(minNum) - df['1ema'][len(df)-1]) / ((float(minNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1.5 : #0.25
-                fig.add_shape(
-                    type="rect",
-                    y0=minNum, y1=maxNum, x0=-1, x1=len(df),
-                    fillcolor='gray',
-                    opacity=round(cluster[1] / max_volume,3)
-                )
+    if len(clusterList) > 0:
+        volumes = [cluster[1] for cluster in clusterList]
+        mazz = np.percentile(volumes, 65) 
+        max_volume = max(cluster[1] for cluster in clusterList if cluster[1] > mazz)
+        
+        for cluster in clusterList:
+            if cluster[1] > mazz:
+                #for i in cluster[0]:
+                maxNum = max([i[0] for i in cluster[0]])
+                minNum = min([i[0] for i in cluster[0]]) 
+                if (abs(float(maxNum) - df['1ema'][len(df)-1]) / ((float(maxNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1.5 or (abs(float(minNum) - df['1ema'][len(df)-1]) / ((float(minNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1.5 : #0.25
+                    fig.add_shape(
+                        type="rect",
+                        y0=minNum, y1=maxNum, x0=-1, x1=len(df),
+                        fillcolor='gray',
+                        opacity=round(cluster[1] / max_volume,3)
+                    )
+                        
+                    # Upper line
+                    fig.add_trace(go.Scatter(
+                        x=df['time'],
+                        y=[maxNum] * len(df),
+                        line_color=f"rgba(128, 128, 128, {round(cluster[1] / max_volume,3)})",
+                        text=f"{maxNum} : {cluster[1]}",
+                        textposition="bottom left",
+                        name=f"{maxNum} : {cluster[1]}",
+                        showlegend=False,
+                        mode='lines'
+                    ), row=1, col=1)
+        
+                    # Lower line
+                    fig.add_trace(go.Scatter(
+                        x=df['time'],
+                        y=[minNum] * len(df),
+                        line_color=f"rgba(128, 128, 128, {round(cluster[1] / max_volume,3)})",
+                        text=f"{minNum} : {cluster[1]}",
+                        textposition="bottom left",
+                        name=f"{minNum} : {cluster[1]}",
+                        showlegend=False,
+                        mode='lines'
+                    ), row=1, col=1)
                     
-                # Upper line
-                fig.add_trace(go.Scatter(
-                    x=df['time'],
-                    y=[maxNum] * len(df),
-                    line_color=f"rgba(128, 128, 128, {round(cluster[1] / max_volume,3)})",
-                    text=f"{maxNum} : {cluster[1]}",
-                    textposition="bottom left",
-                    name=f"{maxNum} : {cluster[1]}",
-                    showlegend=False,
-                    mode='lines'
-                ), row=1, col=1)
-    
-                # Lower line
-                fig.add_trace(go.Scatter(
-                    x=df['time'],
-                    y=[minNum] * len(df),
-                    line_color=f"rgba(128, 128, 128, {round(cluster[1] / max_volume,3)})",
-                    text=f"{minNum} : {cluster[1]}",
-                    textposition="bottom left",
-                    name=f"{minNum} : {cluster[1]}",
-                    showlegend=False,
-                    mode='lines'
-                ), row=1, col=1)
-                
     
     # Add a table in the second column
     transposed_data = list(zip(*troInterval[::-1]))
@@ -3819,50 +3820,53 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
 
 
     #calculate_ttm_squeeze(df)
+    if stkName == 'NQ':
+        blob = bucket.blob('DailyNQtopOrders-1')
+        
+        # Download the blob content as text
+        blob_text = blob.download_as_text()
+        
+        # Split the text into a list (assuming each line is an item)
+        dailyNQtopOrders = blob_text.splitlines()
+        
+            # Step 1: Split each line into fields
+        split_data = [row.split(', ') for row in dailyNQtopOrders]
+        
+        # Step 2: Convert numeric fields properly
+        converted_data = []
+        for row in split_data:
+            new_row = [
+                float(row[0]),       # price -> float
+                int(row[1]),         # quantity -> int
+                int(row[2]),         # id -> int
+                int(row[3]),         # field4 -> int
+                int(row[4]),         # field5 -> int
+                row[5],              # letter -> str
+                row[6]               # time -> str
+            ]
+            converted_data.append(new_row)
+        
+        # Step 3: Make it a numpy array
+        array_data = np.array(converted_data, dtype=object)
+        nupAllTrades = np.array(AllTrades, dtype=object)
+        
+        combined_trades = np.concatenate((array_data, nupAllTrades), axis=0)
+        combined_trades = pd.DataFrame(combined_trades)
+        
+        combined_trades_sorted = combined_trades.sort_values(by=combined_trades.columns[1], ascending=False)
+        combined_trades_sorted = combined_trades_sorted.iloc[:1000]
+        #prices = combined_trades_sorted.iloc[:, 0,1].sort_values().tolist()  # Sorted list of prices
+        prices = combined_trades_sorted.iloc[:, [0, 1, 5]].sort_values(by=combined_trades_sorted.columns[0]).values.tolist()
     
-    blob = bucket.blob('DailyNQtopOrders-1')
+        
+        differences = [abs(prices[i + 1][0] - prices[i][0]) for i in range(len(prices) - 1)]
+        average_difference = sum(differences) / len(differences)
     
-    # Download the blob content as text
-    blob_text = blob.download_as_text()
+        # Step 3: Find clusters
+        cdata = find_clusters_1(prices, average_difference)
     
-    # Split the text into a list (assuming each line is an item)
-    dailyNQtopOrders = blob_text.splitlines()
-    
-        # Step 1: Split each line into fields
-    split_data = [row.split(', ') for row in dailyNQtopOrders]
-    
-    # Step 2: Convert numeric fields properly
-    converted_data = []
-    for row in split_data:
-        new_row = [
-            float(row[0]),       # price -> float
-            int(row[1]),         # quantity -> int
-            int(row[2]),         # id -> int
-            int(row[3]),         # field4 -> int
-            int(row[4]),         # field5 -> int
-            row[5],              # letter -> str
-            row[6]               # time -> str
-        ]
-        converted_data.append(new_row)
-    
-    # Step 3: Make it a numpy array
-    array_data = np.array(converted_data, dtype=object)
-    nupAllTrades = np.array(AllTrades, dtype=object)
-    
-    combined_trades = np.concatenate((array_data, nupAllTrades), axis=0)
-    combined_trades = pd.DataFrame(combined_trades)
-    
-    combined_trades_sorted = combined_trades.sort_values(by=combined_trades.columns[1], ascending=False)
-    combined_trades_sorted = combined_trades_sorted.iloc[:1000]
-    #prices = combined_trades_sorted.iloc[:, 0,1].sort_values().tolist()  # Sorted list of prices
-    prices = combined_trades_sorted.iloc[:, [0, 1, 5]].sort_values(by=combined_trades_sorted.columns[0]).values.tolist()
-
-    
-    differences = [abs(prices[i + 1][0] - prices[i][0]) for i in range(len(prices) - 1)]
-    average_difference = sum(differences) / len(differences)
-
-    # Step 3: Find clusters
-    cdata = find_clusters_1(prices, average_difference)
+    else:
+        cdata = []
 
     
     
