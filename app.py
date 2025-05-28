@@ -1890,7 +1890,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                 #for i in cluster[0]:
                 maxNum = max([i[0] for i in cluster[0]])
                 minNum = min([i[0] for i in cluster[0]]) 
-                if (abs(float(maxNum) - df['1ema'][len(df)-1]) / ((float(maxNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1.5 or (abs(float(minNum) - df['1ema'][len(df)-1]) / ((float(minNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1.5 : #0.25
+                if (abs(float(maxNum) - df['1ema'][len(df)-1]) / ((float(maxNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1.2 or (abs(float(minNum) - df['1ema'][len(df)-1]) / ((float(minNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1.2 : #0.25
                     fig.add_shape(
                         type="rect",
                         y0=minNum, y1=maxNum, x0=-1, x1=len(df),
