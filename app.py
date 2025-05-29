@@ -1882,7 +1882,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #mazz = sum(cluster[1] for cluster in cdata) / len(cdata)
     if len(clusterList) > 0:
         volumes = [cluster[1] for cluster in clusterList]
-        mazz = np.percentile(volumes, 65) 
+        mazz = np.percentile(volumes, 75) 
         max_volume = max(cluster[1] for cluster in clusterList if cluster[1] > mazz)
         
         for cluster in clusterList:
