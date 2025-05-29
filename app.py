@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Thu May 29 11:28:18 2025
+
+@author: UOBASUB
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Thu May 22 01:46:16 2025
 
 @author: UOBASUB
@@ -2763,7 +2770,7 @@ bucket = gclient.get_bucket("stockapp-storage")
 from google.api_core.exceptions import NotFound
 #from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
-initial_inter = 1800000  # Initial interval #210000#250000#80001
+initial_inter = 2000000  # Initial interval #210000#250000#80001
 subsequent_inter = 80000  # Subsequent interval
 app = Dash()
 app.title = "EnVisage"
@@ -2891,7 +2898,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         symbolNum = symbolNumList[symbolNameList.index(stkName)]
         
     if interv not in intList:
-        interv = '10'
+        interv = '5'
         
     clustNum = '20'
         
@@ -3721,7 +3728,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     df['has_19_occurred'] = df['time'].eq("19:00:00").cumsum().astype(bool)
     
     for p in range(len(df)):
-        if df.at[p, 'has_19_occurred']:
+        #if df.at[p, 'has_19_occurred']:
             # Initial trade entry conditions (fixed for better execution) not stillsell and
             #if not stillsell and ((abs(df.at[p, 'POCDistanceEMA']) <= 0.021)  & (df.at[p, 'smoothed_derivative'] > 0) & ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0))):
             #    df.at[p, 'buy_signal'] = True
@@ -3741,7 +3748,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 #(df.at[p, 'POCDistanceEMA'] < -0.048) and 
                 (df.at[p, 'smoothed_derivative'] < 0) and 
                 ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
-                (df.at[p, 'vwap_signalSell']) and
+                #(df.at[p, 'vwap_signalSell']) and
                 (df.at[p, 'LVA_signalSell']) and
                 (df.at[p, 'HVA_signalSell']) #and 
                 #(abs(df.at[p, 'POCDistanceEMA']) < 0.23) 
@@ -3761,7 +3768,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 #(df.at[p, 'POCDistanceEMA'] > 0.048) and 
                 (df.at[p, 'smoothed_derivative'] > 0) and 
                 ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
-                (df.at[p, 'vwap_signalBuy']) and
+                #(df.at[p, 'vwap_signalBuy']) and
                 (df.at[p, 'LVA_signalBuy']) and
                 (df.at[p, 'HVA_signalBuy']) #and 
                 #(abs(df.at[p, 'POCDistanceEMA']) < 0.23) 
@@ -3781,7 +3788,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 #(df.at[p, 'POCDistanceEMA'] > 0.048) and 
                 (df.at[p, 'smoothed_derivative'] > 0) and 
                 ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
-                (df.at[p, 'vwap_signalBuy']) and
+                #(df.at[p, 'vwap_signalBuy']) and
                 (df.at[p, 'LVA_signalBuy']) and
                 (df.at[p, 'HVA_signalBuy']) #and 
                 #(abs(df.at[p, 'POCDistanceEMA']) < 0.23) 
@@ -3800,7 +3807,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 #(df.at[p, 'POCDistanceEMA'] < -0.048) and 
                 (df.at[p, 'smoothed_derivative'] < 0) and 
                 ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
-                (df.at[p, 'vwap_signalSell']) and
+                #(df.at[p, 'vwap_signalSell']) and
                 (df.at[p, 'LVA_signalSell']) and
                 (df.at[p, 'HVA_signalSell']) #and 
                 #(abs(df.at[p, 'POCDistanceEMA']) < 0.23) 
