@@ -3113,7 +3113,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             hstp = historV1(df[:startIndex+it],int(tpoNum),{}, tempList, [])
             vA = valueAreaV3(hstp[0])
             valist.append(vA  + [df['timestamp'][startIndex+it], df['time'][startIndex+it], hstp[2]])
-            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(100)]#tpoNum
+            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(200)]#tpoNum
             
             
             
@@ -3295,7 +3295,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             vA = valueAreaV3(temphs[0])
             valist.append(vA  + [df['timestamp'][it], df['time'][it], temphs[2]])
             
-            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(100)]#tpoNum
+            nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(200)]#tpoNum
             timestamp_s = make[it][0] / 1_000_000_000
             new_timestamp_s = timestamp_s + (int(interv)*60)
             new_timestamp_ns = int(new_timestamp_s * 1_000_000_000)
