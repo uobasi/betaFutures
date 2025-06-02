@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Mon Jun  2 11:43:54 2025
+
+@author: UOBASUB
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Thu May 29 11:28:18 2025
 
 @author: UOBASUB
@@ -668,7 +675,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     
     #ratio = str(round(max(tosells,tobuys)/min(tosells,tobuys),3))
     # Ratio : '+str(ratio)+' ' 
-    tpString = ' (Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+') | '+ '(Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+'))' + df['vpShape'].iloc[-1] + ' ' + str(df['vpShapeConfidence'].iloc[-1])
+    tpString = ' (Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+') | '+ '(Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+'))'# + df['vpShape'].iloc[-1] + ' ' + str(df['vpShapeConfidence'].iloc[-1])
     
     '''
     putDec = 0
@@ -848,8 +855,22 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
         fig.add_hline(y=0, row=3, col=1)
     else:
-        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Posdiff'], marker_color='teal'), row=3, col=1)
-        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Negdiff'], marker_color='crimson'), row=3, col=1)
+        #fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Posdiff'], marker_color='teal'), row=3, col=1)
+        #fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Negdiff'], marker_color='crimson'), row=3, col=1)
+        #fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Negdiff'], marker_color='crimson'), row=3, col=1)
+        colors = ['maroon']
+        for val in range(1,len(df['topDiffOverallInCandle'])):
+            if df['topDiffOverallInCandle'][val] > 0:
+                color = 'teal'
+                if df['topDiffOverallInCandle'][val] > df['topDiffOverallInCandle'][val-1]:
+                    color = '#54C4C1' 
+            else:
+                color = 'maroon'
+                if df['topDiffOverallInCandle'][val] < df['topDiffOverallInCandle'][val-1]:
+                    color='crimson' 
+            colors.append(color)
+        fig.add_trace(go.Bar(x=df['time'], y=df['topDiffOverallInCandle'], marker_color=colors), row=2, col=1)
+        
 
     fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines', opacity=0.50, name='P',marker_color='#0000FF')) # #0000FF
     #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
@@ -1733,8 +1754,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         fig.add_trace(go.Bar(x=df['time'], y=df['POCDistanceEMA'], marker_color=colors), row=2, col=1)
      
     else:
-        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topBuys'], marker_color='teal'), row=2, col=1)
-        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topSells'], marker_color='crimson'), row=2, col=1)
+        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topBuys'], marker_color='teal'), row=3, col=1)
+        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topSells'], marker_color='crimson'), row=3, col=1)
         
         
 
@@ -3139,17 +3160,18 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         stored_data['pdata'] = stored_data['pdata'][:len(stored_data['pdata'])-1] + valist
 
         
-        bolist = [0]
-        for i in range(len(stored_data['tro'])-1):
-            bolist.append(stored_data['tro'][i+1][1] - stored_data['tro'][i][1])
+        bolist = [0] + [stored_data['tro'][i+1][1] - stored_data['tro'][i][1] for i in range(len(stored_data['tro'])-1)]
+        #for i in range(len(stored_data['tro'])-1):
+            #bolist.append(stored_data['tro'][i+1][1] - stored_data['tro'][i][1])
             
-        solist = [0] 
-        for i in range(len(stored_data['tro'])-1):
-            solist.append(stored_data['tro'][i+1][3] - stored_data['tro'][i][3])
+        solist = [0] + [stored_data['tro'][i+1][3] - stored_data['tro'][i][3] for i in range(len(stored_data['tro'])-1)]
+        #for i in range(len(stored_data['tro'])-1):
+            #solist.append(stored_data['tro'][i+1][3] - stored_data['tro'][i][3])
             
         newst = [[stored_data['tro'][i][0], stored_data['tro'][i][1], bolist[i], stored_data['tro'][i][3], solist[i], stored_data['tro'][i][5], stored_data['tro'][i][6]] for i in range(len(stored_data['tro']))]
         stored_data['tro'] = newst
         
+        '''
         vpShape = []
         for it in range(len(make)):
             if it+1 < len(make):
@@ -3172,7 +3194,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             
         df['vpShape'] = pd.Series([i[0] for i in stored_data['vpShape']])
         df['vpShapeConfidence'] = pd.Series([i[1] for i in stored_data['vpShape']])
-        
+        '''
         
         all_trades_np = np.array(AllTrades, dtype=object)
         top100perCandle = []
@@ -3319,6 +3341,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             
         dst = [[bful[row][0], bful[row][1], bolist[row], bful[row][2], solist[row], bful[row][3], bful[row][4]] for row in  range(len(bful))]
         
+        '''
         vpShape = []
         for it in range(len(make)):
             if it+1 < len(make):
@@ -3340,7 +3363,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             
         df['vpShape'] = pd.Series([i[0] for i in vpShape])
         df['vpShapeConfidence'] = pd.Series([i[1] for i in vpShape])
-
+        '''
             
         all_trades_np = np.array(AllTrades, dtype=object)
         top100perCandle = []
@@ -3412,7 +3435,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         top100perCandle_diff = [i[3] for i in top100perCandle]
         df['topDiffOverallInCandle'] = top100perCandle_diff + [np.nan] * (len(df) - len(top100perCandle_diff))
             
-        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist, 'troPerCandle':troPerCandle, 'top100perCandle' : top100perCandle, 'vpShape':vpShape} 
+        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist, 'troPerCandle':troPerCandle, 'top100perCandle' : top100perCandle} #'vpShape':vpShape} 
         
     
     
@@ -3538,9 +3561,9 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         df['POCDistance'] = (df['smoothed_1ema'] - df['POC']) / df['POC'] * 100
         df['POCDistanceEMA'] = df['POCDistance']#((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
         df['vwapDistance'] = (df['smoothed_1ema'] - df['vwap']) / df['vwap'] * 100
-        df['uppervwapDistance'] = (df['smoothed_1ema'] - df['uppervwapAvg']) / df['uppervwapAvg'] * 100
-        df['lowervwapDistance'] = (df['smoothed_1ema'] - df['lowervwapAvg']) / df['lowervwapAvg'] * 100
-        df['vwapAvgDistance'] = (df['smoothed_1ema'] - df['vwapAvg']) / df['vwapAvg'] * 100
+        #df['uppervwapDistance'] = (df['smoothed_1ema'] - df['uppervwapAvg']) / df['uppervwapAvg'] * 100
+        #df['lowervwapDistance'] = (df['smoothed_1ema'] - df['lowervwapAvg']) / df['lowervwapAvg'] * 100
+        #df['vwapAvgDistance'] = (df['smoothed_1ema'] - df['vwapAvg']) / df['vwapAvg'] * 100
         df['LVADistance'] = (df['smoothed_1ema'] - df['LowVA']) / df['LowVA'] * 100
         df['HVADistance'] = (df['smoothed_1ema'] - df['HighVA']) / df['HighVA'] * 100
         #df['POCDistanceEMA'] = df['POCDistanceEMA'].ewm(span=2, adjust=False).mean()#gaussian_filter1d(df['POCDistanceEMA'], sigma=int(1))##
@@ -3628,17 +3651,17 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         #(df['POCDistanceEMA'] < df['negative_meanEma']) & (df['smoothed_derivative'] < 0)  &
         
                 
-        df['vwap_signalBuy'] = df.apply(vwapDistanceCheckBuy, axis=1)
-        df['vwap_signalSell'] = df.apply(vwapDistanceCheckSell, axis=1)
+        #df['vwap_signalBuy'] = df.apply(vwapDistanceCheckBuy, axis=1)
+        #df['vwap_signalSell'] = df.apply(vwapDistanceCheckSell, axis=1)
         
-        df['uppervwap_signalBuy'] = df.apply(uppervwapDistanceCheckBuy, axis=1)
-        df['uppervwap_signalSell'] = df.apply(uppervwapDistanceCheckSell, axis=1) 
+        #df['uppervwap_signalBuy'] = df.apply(uppervwapDistanceCheckBuy, axis=1)
+        #df['uppervwap_signalSell'] = df.apply(uppervwapDistanceCheckSell, axis=1) 
         
-        df['lowervwap_signalBuy'] = df.apply(lowervwapDistanceCheckBuy, axis=1)
-        df['lowervwap_signalSell'] = df.apply(lowervwapDistanceCheckSell, axis=1) 
+        #df['lowervwap_signalBuy'] = df.apply(lowervwapDistanceCheckBuy, axis=1)
+        #df['lowervwap_signalSell'] = df.apply(lowervwapDistanceCheckSell, axis=1) 
         
-        df['vwapAvg_signalBuy'] = df.apply(vwapAvgDistanceCheckBuy, axis=1)
-        df['vwapAvg_signalSell'] = df.apply(vwapAvgDistanceCheckSell, axis=1)  
+        #df['vwapAvg_signalBuy'] = df.apply(vwapAvgDistanceCheckBuy, axis=1)
+        #df['vwapAvg_signalSell'] = df.apply(vwapAvgDistanceCheckSell, axis=1)  
         
         df['LVA_signalBuy'] =  df.apply(LVADistanceCheckBuy, axis=1)
         df['LVA_signalSell'] = df.apply(LVADistanceCheckSell, axis=1)
@@ -3876,7 +3899,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         cdata = []
 
     
-    
+    #df.to_csv('market_data.csv', index=False)
         
     if interval_time == initial_inter:
         interval_time = subsequent_inter
