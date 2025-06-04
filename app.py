@@ -675,7 +675,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     
     #ratio = str(round(max(tosells,tobuys)/min(tosells,tobuys),3))
     # Ratio : '+str(ratio)+' ' 
-    tpString = ' (Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+') | '+ '(Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+'))'# + df['vpShape'].iloc[-1] + ' ' + str(df['vpShapeConfidence'].iloc[-1])
+    tpString = ' (Buy:' + str(tobuys) + '('+str(round(tobuys/(tobuys+tosells),2))+') | '+ '(Sell:' + str(tosells) + '('+str(round(tosells/(tobuys+tosells),2))+'))' + 'Buys: '+str(df['topOrderOverallBuyInCandle'].sum()) + ' Sells: '+str(df['topOrderOverallSellInCandle'].sum())# + df['vpShape'].iloc[-1] + ' ' + str(df['vpShapeConfidence'].iloc[-1])
     
     '''
     putDec = 0
