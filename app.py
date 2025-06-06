@@ -1918,19 +1918,37 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                 #for i in cluster[0]:
                 maxNum = max([i[0] for i in cluster[0]])
                 minNum = min([i[0] for i in cluster[0]]) 
+                bidCount = sum([i[1] for i in cluster[0] if i[2] == 'B'])
+                askCount = sum([i[1] for i in cluster[0] if i[2] == 'A'])
+                totalVolume = bidCount + askCount
+                if totalVolume > 0:
+                    askDec = round(askCount / totalVolume, 2)
+                    bidDec = round(bidCount / totalVolume, 2)
+                else:
+                    askDec = bidDec = 0
+
+                opac = round(cluster[1] / max_volume,3)
+                #if (abs(float(maxNum) - df['1ema'][len(df)-1]) / ((float(maxNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 2.25 or (abs(float(minNum) - df['1ema'][len(df)-1]) / ((float(minNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 2.25 :
+                fillcolor = (
+                    "crimson" if askCount > bidCount else
+                    "teal" if bidCount > askCount else
+                    "gray"
+                )
+                linecolor = f'rgba(220,20,60,{opac})' if askCount > bidCount else (
+                            f'rgba(0,139,139,{opac})' if bidCount > askCount else 'gray')
                 if (abs(float(maxNum) - df['1ema'][len(df)-1]) / ((float(maxNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1.25 or (abs(float(minNum) - df['1ema'][len(df)-1]) / ((float(minNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1.25 : #0.25
                     fig.add_shape(
                         type="rect",
                         y0=minNum, y1=maxNum, x0=-1, x1=len(df),
-                        fillcolor='gray',
-                        opacity=round(cluster[1] / max_volume,3)
+                        fillcolor= fillcolor,#'gray',
+                        opacity= opac#round(cluster[1] / max_volume,3)
                     )
                         
                     # Upper line
                     fig.add_trace(go.Scatter(
                         x=df['time'],
                         y=[maxNum] * len(df),
-                        line_color=f"rgba(128, 128, 128, {round(cluster[1] / max_volume,3)})",
+                        line_color=linecolor,#f"rgba(128, 128, 128, {round(cluster[1] / max_volume,3)})",
                         text=f"{maxNum} : {cluster[1]}",
                         textposition="bottom left",
                         name=f"{maxNum} : {cluster[1]}",
@@ -1942,7 +1960,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                     fig.add_trace(go.Scatter(
                         x=df['time'],
                         y=[minNum] * len(df),
-                        line_color=f"rgba(128, 128, 128, {round(cluster[1] / max_volume,3)})",
+                        line_color=linecolor,#f"rgba(128, 128, 128, {round(cluster[1] / max_volume,3)})",
                         text=f"{minNum} : {cluster[1]}",
                         textposition="bottom left",
                         name=f"{minNum} : {cluster[1]}",
