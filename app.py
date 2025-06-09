@@ -3868,7 +3868,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
 
 
     #calculate_ttm_squeeze(df)
-    if stkName == 'NQ' or stkName == 'ES':
+    if stkName == 'NQ' or stkName == 'ES' or stkName == 'YM':
         blob = bucket.blob('Daily'+stkName+'topOrders')
         
         # Download the blob content as text
