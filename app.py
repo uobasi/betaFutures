@@ -3135,7 +3135,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             new_timestamp_s = timestamp_s + (int(interv)*60)
             new_timestamp_ns = int(new_timestamp_s * 1_000_000_000)
 
-            bful.append([make[it][1], sum([i[1] for i in nelist if i[5] == 'B']), sum([i[1] for i in nelist if i[5] == 'A']),  sum([i[1] for i in nelist if (i[2] >= make[it][0] and i[2] <= new_timestamp_ns) and i[5] == 'B']), sum([i[1] for i in nelist if (i[2] >= make[it][0] and i[2] <= new_timestamp_ns) and i[5] == 'A']) ])
+            bful.append([make[it][1], sum([i[1] for i in nelist if i[5] == 'B']), sum([i[1] for i in nelist if i[5] == 'A']),  sum([i[1] for i in nelist if (i[2] >= make[it][0] and i[2] < new_timestamp_ns) and i[5] == 'B']), sum([i[1] for i in nelist if (i[2] >= make[it][0] and i[2] < new_timestamp_ns) and i[5] == 'A']) ])
             
             
   
@@ -3315,7 +3315,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             new_timestamp_s = timestamp_s + (int(interv)*60)
             new_timestamp_ns = int(new_timestamp_s * 1_000_000_000)
 
-            bful.append([make[it][1], sum([i[1] for i in nelist if i[5] == 'B']), sum([i[1] for i in nelist if i[5] == 'A']),  sum([i[1] for i in nelist if (i[2] >= make[it][0] and i[2] <= new_timestamp_ns) and i[5] == 'B']), sum([i[1] for i in nelist if (i[2] >= make[it][0] and i[2] <= new_timestamp_ns) and i[5] == 'A']) ])
+            bful.append([make[it][1], sum([i[1] for i in nelist if i[5] == 'B']), sum([i[1] for i in nelist if i[5] == 'A']),  sum([i[1] for i in nelist if (i[2] >= make[it][0] and i[2] < new_timestamp_ns) and i[5] == 'B']), sum([i[1] for i in nelist if (i[2] >= make[it][0] and i[2] < new_timestamp_ns) and i[5] == 'A']) ])
             
         bolist = [0]
         for i in range(len(bful)-1):
