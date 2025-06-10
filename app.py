@@ -1,54 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jun  2 11:43:54 2025
-
-@author: UOBASUB
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Thu May 29 11:28:18 2025
-
-@author: UOBASUB
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Thu May 22 01:46:16 2025
-
-@author: UOBASUB
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Mar 20 00:37:17 2025
-
-@author: UOBASUB
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Feb 16 03:50:19 2025
-
-@author: uobas
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Jan 27 09:35:54 2025
-
-@author: UOBASUB
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jan 21 16:42:48 2025
-
-@author: UOBASUB
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Wed Dec 13 01:11:16 2023
 
 @author: UOBASUB
@@ -649,7 +600,7 @@ def find_spikes(data, high_percentile=97, low_percentile=3):
     
     return spikes
 
-def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:list=[],   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterList:list=[], troInterval:list=[], toggle_value:list=[], poly_value:list=[]):
+def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:list=[],   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterList:list=[], intraDayclusterList:list=[], troInterval:list=[], toggle_value:list=[], poly_value:list=[]):
   
     notround = np.average(df_dx)
     average = round(np.average(df_dx), 3)
@@ -1967,7 +1918,24 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                         showlegend=False,
                         mode='lines'
                     ), row=1, col=1)
-                    
+    
+    sorted_list = sorted(intraDayclusterList, key=len, reverse=True)
+    for i in sorted_list[:40]:
+    
+
+        fig.add_trace(go.Scatter(x=df['time'],
+                             y= [i[len(i)-1]]*len(df.index) ,
+                             line_color='gray',
+                             text =  str(i[len(i)-1])+ '<br>Cluster Count: ' + str(len(i)),
+                             textposition="bottom left",
+                             name= str(i[len(i)-1]),
+                             showlegend=False,
+                             mode= 'lines',
+                             opacity=0.2
+                            
+                            ),
+                  row=1, col=1)
+
     
     # Add a table in the second column
     transposed_data = list(zip(*troInterval[::-1]))
@@ -3082,13 +3050,13 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     
     [mTrade[i].insert(4,i) for i in range(len(mTrade))] 
 
-    '''
+    
     data =  [i[0] for i in AllTrades]#[:500]
     data.sort(reverse=True)
     differences = [abs(data[i + 1] - data[i]) for i in range(len(data) - 1)]
     average_difference = (sum(differences) / len(differences))
-    cdata = find_clusters(data, average_difference)
-    '''
+    cdata1 = find_clusters(data, average_difference)
+    
     
     newwT = []
     for i in mTrade:
@@ -3928,7 +3896,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     #toggle_value=[]
     #poly_value=[]
     
-    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterList=cdata, troInterval=stored_data['tro'], toggle_value=toggle_value, poly_value=poly_value ) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterList=cdata, intraDayclusterList=cdata1, troInterval=stored_data['tro'], toggle_value=toggle_value, poly_value=poly_value ) #trends=FindTrends(df,n=10)
  
     return stored_data, fg, previous_stkName, previous_interv, interval_time
 
