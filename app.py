@@ -1920,7 +1920,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                     ), row=1, col=1)
     
     sorted_list = sorted(intraDayclusterList, key=len, reverse=True)
-    for i in sorted_list[:40]:
+    for i in sorted_list[:80]:
     
 
         fig.add_trace(go.Scatter(x=df['time'],
