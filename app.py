@@ -2758,8 +2758,8 @@ def find_clusters_1(data, threshold):
 #symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
 #symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
 
-symbolNumList =  ['4916', '42005804', '42003068', '134373', '287', '42009162', '42007178', '42008377']
-symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'RTY', 'MBT', 'MET']
+symbolNumList =  ['14160', 42008487, 42003287]
+symbolNameList = ['ES', 'NQ', 'YM']
 
 
 intList = [str(i) for i in range(3,30)]
