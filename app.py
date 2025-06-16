@@ -762,26 +762,26 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     
     fig.add_trace(go.Scatter(x=df['time'],
                              y= [num1]*len(df.index) ,
-                             line_color='red',
-                             text = '<br>HVA: ' + str(num1),
+                             line_color='#16FF32',
+                             text = '<br>LVA: ' + str(num1),
                              textposition="bottom left",
                              name= str(num1),
                              showlegend=False,
                              mode= 'lines',
-                             opacity=0.2
+                             #opacity=0.2
                             
                             ),
                   row=1, col=1) 
 
     fig.add_trace(go.Scatter(x=df['time'],
                              y= [num2]*len(df.index) ,
-                             line_color='#16FF32',
-                             text = '<br>LVA: ' + str(num2),
+                             line_color='red',
+                             text = '<br>HVA: ' + str(num2),
                              textposition="bottom left",
                              name= str(num2),
                              showlegend=False,
                              mode= 'lines',
-                             opacity=0.2
+                             #opacity=0.2
                             
                             ),
                   row=1, col=1)
