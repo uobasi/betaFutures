@@ -768,7 +768,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                              name= str(num1),
                              showlegend=False,
                              mode= 'lines',
-                             #opacity=0.2
+                             opacity=0.8
                             
                             ),
                   row=1, col=1) 
@@ -781,7 +781,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                              name= str(num2),
                              showlegend=False,
                              mode= 'lines',
-                             #opacity=0.2
+                             opacity=0.8
                             
                             ),
                   row=1, col=1)
