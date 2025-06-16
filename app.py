@@ -771,7 +771,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                              opacity=0.2
                             
                             ),
-                  row=1, col=1) 16FF32
+                  row=1, col=1) 
 
     fig.add_trace(go.Scatter(x=df['time'],
                              y= [num2]*len(df.index) ,
