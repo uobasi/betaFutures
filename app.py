@@ -753,12 +753,13 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #sPercent = sum([i[1] for i in adlist]) * .70
     #tp = valueAreaV1(lst2[0])
     
-    
+    '''
     fig.add_shape(type="rect",
                   y0=num1, y1=num2, x0=-1, x1=len(df),
                   fillcolor="crimson",
                   opacity=0.09,
                   )
+    '''
     
     fig.add_trace(go.Scatter(x=df['time'],
                              y= [num1]*len(df.index) ,
