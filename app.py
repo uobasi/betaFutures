@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Tue Jun 24 14:59:59 2025
+
+@author: UOBASUB
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Wed Dec 13 01:11:16 2023
 
 @author: UOBASUB
@@ -849,6 +856,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         
 
     fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines', opacity=0.50, name='P',marker_color='#0000FF')) # #0000FF
+    fig.add_trace(go.Scatter(x=df['time'], y=df['Smoothed_POC'], mode='lines', opacity=0.50, name='Smoothed_POC',marker_color='black'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30,name='HighVA',marker_color='rgba(0,0,0)'))
     
@@ -3680,6 +3688,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         df['HVA_signalBuy'] =  df.apply(HVADistanceCheckBuy, axis=1)
         df['HVA_signalSell'] = df.apply(HVADistanceCheckSell, axis=1)
         
+        df['Smoothed_POC'] = df['POC'].ewm(span=8, adjust=False).mean()
+        
         
         #df['buy_signal'] = (df['POCDistanceEMA'].abs() <= 0.021) & (df['smoothed_derivative'] > 0) & ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0))#(df['smoothed_1ema'] >= df['POC']) & (df['POCDistanceEMA'] > 0.048) & (df['smoothed_derivative'] > 0)& ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0)) & (df['vwap_signalBuy'])#0.03 0.0183& (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
         
@@ -3777,8 +3787,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             # Exit condition for stillbuy → Trigger a sell
             if (
                 stillbuy and 
-                (df.at[p, 'smoothed_1ema'] <= df.at[p, 'POC']) and 
-                (df.at[p, 'close'] <= df.at[p, 'POC']) and 
+                (df.at[p, 'smoothed_1ema'] <= df.at[p, 'Smoothed_POC']) and 
+                (df.at[p, 'close'] <= df.at[p, 'Smoothed_POC']) and 
                 #(df.at[p, 'POCDistanceEMA'] < -0.048) and 
                 (df.at[p, 'smoothed_derivative'] < 0) and 
                 ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
@@ -3797,8 +3807,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             # Exit condition for stillsell → Trigger a buy
             if (
                 stillsell and 
-                (df.at[p, 'smoothed_1ema'] >= df.at[p, 'POC']) and
-                (df.at[p, 'close'] >= df.at[p, 'POC']) and 
+                (df.at[p, 'smoothed_1ema'] >= df.at[p, 'Smoothed_POC']) and
+                (df.at[p, 'close'] >= df.at[p, 'Smoothed_POC']) and 
                 #(df.at[p, 'POCDistanceEMA'] > 0.048) and 
                 (df.at[p, 'smoothed_derivative'] > 0) and 
                 ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
@@ -3817,8 +3827,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 
             if (
                 not stillsell and not stillbuy and 
-                (df.at[p, 'smoothed_1ema'] >= df.at[p, 'POC']) and 
-                (df.at[p, 'close'] >= df.at[p, 'POC']) and 
+                (df.at[p, 'smoothed_1ema'] >= df.at[p, 'Smoothed_POC']) and 
+                (df.at[p, 'close'] >= df.at[p, 'Smoothed_POC']) and 
                 #(df.at[p, 'POCDistanceEMA'] > 0.048) and 
                 (df.at[p, 'smoothed_derivative'] > 0) and 
                 ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
@@ -3836,8 +3846,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 
             if (
                 not stillsell and not stillbuy and 
-                (df.at[p, 'smoothed_1ema'] <= df.at[p, 'POC']) and
-                (df.at[p, 'close'] <= df.at[p, 'POC']) and  
+                (df.at[p, 'smoothed_1ema'] <= df.at[p, 'Smoothed_POC']) and
+                (df.at[p, 'close'] <= df.at[p, 'Smoothed_POC']) and  
                 #(df.at[p, 'POCDistanceEMA'] < -0.048) and 
                 (df.at[p, 'smoothed_derivative'] < 0) and 
                 ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
@@ -3920,6 +3930,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         
     #toggle_value=[]
     #poly_value=[]
+    
     
     fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterList=cdata, intraDayclusterList=cdata1, troInterval=stored_data['tro'], toggle_value=toggle_value, poly_value=poly_value ) #trends=FindTrends(df,n=10)
  
