@@ -766,7 +766,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                   fillcolor="crimson",
                   opacity=0.09,
                   )
-    '''
+    
     
     fig.add_trace(go.Scatter(x=df['time'],
                              y= [num1]*len(df.index) ,
@@ -793,7 +793,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                             
                             ),
                   row=1, col=1)
-
+    '''
     colo = []
     for fk in sortadlist2:
         colo.append([str(round(fk[0],7))+'A',fk[7],fk[8], fk[7]/(fk[7]+fk[8]+fk[9]+1), fk[9]])
