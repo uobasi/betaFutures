@@ -1742,7 +1742,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topSells'], marker_color='crimson'), row=3, col=1)
         
         
-
+    
     
     #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[2] for i in OptionTimeFrame]), marker_color='teal'), row=3, col=1)
     #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[3] for i in OptionTimeFrame]), marker_color='crimson'), row=3, col=1)
@@ -1891,6 +1891,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                   row=1, col=1)
 
     '''
+    fig.add_trace(go.Scatter(x=df['time'], y=df['ema_100'], mode='lines',name='ema_100',line=dict(color='green'))) 
     #mazz = sum(cluster[1] for cluster in cdata) / len(cdata)
     if len(clusterList) > 0:
         volumes = [cluster[1] for cluster in clusterList]
@@ -3064,7 +3065,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     df['derivative'] = df_dx
     
     
-
+    df['ema_100'] = df['close'].ewm(span=100, adjust=False).mean()
     # Smooth the derivative using Gaussian filter
     df['smoothed_derivative'] = df['derivative']#gaussian_filter1d(df['derivative'], sigma=int(1)) #df['derivative'].ewm(span=int(5), adjust=False).mean()
     #df['derivative'] = df['derivative'].ewm(span=int(4), adjust=False).mean()
