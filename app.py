@@ -2827,7 +2827,7 @@ app.layout = html.Div([
         dcc.Checklist(
             id='poly-button',
             options=[{'label': 'Show Indicator 2', 'value': 'Poly'}],
-            value=[],  # Default unchecked
+            value=['Poly'],  # Default unchecked
             inline=True,
             className="toggle-container-bottom"
         ),
@@ -2838,7 +2838,7 @@ app.layout = html.Div([
         dcc.Checklist(
             id='toggle-button',
             options=[{'label': 'Show Indicator 1', 'value': 'poc'}],
-            value=[],  # Default unchecked
+            value=['poc'],  # Default unchecked
             inline=True,
             className="toggle-container-bottom"
         ),
