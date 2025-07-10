@@ -1957,10 +1957,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                         mode='lines'
                     ), row=1, col=1)
     
+    '''
     sorted_list = sorted(intraDayclusterList, key=len, reverse=True)
     for i in sorted_list[:50]:
-    
-
         fig.add_trace(go.Scatter(x=df['time'],
                              y= [i[len(i)-1]]*len(df.index) ,
                              line_color='gray',
@@ -1973,7 +1972,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                             
                             ),
                   row=1, col=1)
-
+    '''
     
     # Add a table in the second column
     transposed_data = list(zip(*troInterval[::-1]))
