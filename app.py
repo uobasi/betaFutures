@@ -859,6 +859,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_trace(go.Scatter(x=df['time'], y=df['Smoothed_POC'], mode='lines', opacity=0.50, name='Smoothed_POC',marker_color='black'))
     fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
     fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30,name='HighVA',marker_color='rgba(0,0,0)'))
+
+    fig.add_trace(go.Scatter(x=df['time'], y=df['volumePbottom'], mode='lines', name='volumePbottom'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['volumePtop'], mode='lines', name='volumePtop'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['volumePmid'], mode='lines', name='volumePmid'))  
     
         #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
@@ -2789,6 +2793,9 @@ def find_clusters_1(data, threshold):
     clusters.append((current_cluster, current_sum))
     return clusters
 
+
+def midpoint(a, b):
+    return (a + b) / 2
 #symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
 #symbolNameList = ['ES', 'NQ', 'YM','CL', 'GC', 'HG', 'NG', 'RTY', 'PL',  'SI', 'MBT', 'NIY', 'NKD', 'MET', 'UB']
 
@@ -3160,7 +3167,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 
             hstp = historV1(df[:startIndex+it],int(tpoNum),{}, tempList, [])
             vA = valueAreaV3(hstp[0])
-            valist.append(vA  + [df['timestamp'][startIndex+it], df['time'][startIndex+it], hstp[2]])
+            valist.append(vA  + [df['timestamp'][startIndex+it], df['time'][startIndex+it], hstp[2], hstp[0][0][0], hstp[0][len(hstp[0])-1][3], midpoint(hstp[0][0][0], hstp[0][len(hstp[0])-1][3])])
             nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(200)]#tpoNum
             
             
@@ -3342,7 +3349,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             
             temphs = historV1(df[:it+1],int(tpoNum),{}, tempList, [])
             vA = valueAreaV3(temphs[0])
-            valist.append(vA  + [df['timestamp'][it], df['time'][it], temphs[2]])
+            valist.append(vA  + [df['timestamp'][it], df['time'][it], temphs[2], temphs[0][0][0], temphs[0][len(temphs[0])-1][3], midpoint(temphs[0][0][0], temphs[0][len(temphs[0])-1][3])])
             
             nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(200)]#tpoNum
             timestamp_s = make[it][0] / 1_000_000_000
@@ -3542,6 +3549,9 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         df['POC'] = pd.Series([i[5] for i in stored_data['pdata']])
         df['POC2'] = pd.Series([i[5] for i in stored_data['pdata']])
         df['weights'] = [i[2]-i[3] for i in stored_data['timeFrame']]
+        df['volumePbottom'] = pd.Series([i[6] for i in stored_data['pdata']])
+        df['volumePtop'] = pd.Series([i[7] for i in stored_data['pdata']])
+        df['volumePmid'] = pd.Series([i[8] for i in stored_data['pdata']])
         '''
         blob = Blob('POCData'+str(symbolNum), bucket) 
         POCData = blob.download_as_text()
