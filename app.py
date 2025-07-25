@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Mon Jul 14 04:40:36 2025
+
+@author: uobas
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Tue Jun 24 14:59:59 2025
 
 @author: UOBASUB
@@ -543,7 +550,7 @@ def valueAreaV3(lst):
     # Identify POC (Point of Control) by maximum volume
     poc_item = max(mkk, key=lambda x: x[1])
     pocIndex = poc_item[2]
-    sPercent = total_volume * 0.70  # 70% of total volume
+    sPercent = total_volume * 0.90 # 70% of total volume
     accumulated_volume = poc_item[1]  # Start with POC volume
 
     # Initialize Value Area boundaries
@@ -570,6 +577,76 @@ def valueAreaV3(lst):
 
     # Return Value Area Low, Value Area High, and POC
     return [mkk[topIndex][0], mkk[dwnIndex][0], poc_item[0]]
+
+def valueAreaV4(bins, area_pct: float = 0.70):
+    """
+    Given a list of bins, each as either
+      [price, volume]                or
+      [low_price, volume, idx, high_price],
+    returns [VA_low, VA_high, POC_price] such that the contiguous set of
+    price-levels around POC containing area_pct*100% of total volume is found.
+
+    Steps:
+      1. Compute total volume (ignore zero-vol bins unless all are zero).
+      2. Find POC_price = price of the bin with maximum volume.
+      3. For each bin compute its distance = abs(bin_price − POC_price).
+      4. Sort all bins by distance ascending.
+      5. Accumulate volumes in that order until ≥ area_pct*total.
+      6. VA_low = min(price) among included; VA_high = max(price) among included.
+    """
+    if not bins:
+        return [None, None, None]
+
+    # --- 1) extract (price, vol) pairs ---
+    pv = []
+    for b in bins:
+        # if it’s a 4-element bin, treat price as the midpoint
+        if len(b) >= 4:
+            price = (b[0] + b[3]) / 2
+        else:
+            price = b[0]
+        vol = b[1]
+        pv.append((price, vol))
+
+    # drop zero‐vol bins unless they’re all zero
+    nonzero = [(p, v) for p, v in pv if v > 0]
+    if nonzero:
+        pv = nonzero
+
+    total_vol = sum(v for _, v in pv)
+    if total_vol <= 0:
+        # degenerate
+        prices = [p for p, _ in pv]
+        return [min(prices), max(prices), None]
+
+    # --- 2) find POC_price ---
+    poc_price = max(pv, key=lambda x: x[1])[0]
+
+    # --- 3) compute distance from POC for each bin ---
+    # and keep a copy of volume
+    dist_list = [
+        (abs(price - poc_price), price, vol)
+        for price, vol in pv
+    ]
+
+    # --- 4) sort by distance ascending, then by price ascending
+    dist_list.sort(key=lambda x: (x[0], x[1]))
+
+    # --- 5) accumulate until threshold ---
+    threshold = total_vol * area_pct
+    cum = 0.0
+    included = []
+    for _, price, vol in dist_list:
+        cum += vol
+        included.append(price)
+        if cum >= threshold:
+            break
+
+    # --- 6) VA low/high are the min/max of included prices ---
+    va_low  = min(included)
+    va_high = max(included)
+
+    return [va_low, va_high, poc_price]
 
 
 def find_clusters(numbers, threshold):
@@ -607,7 +684,7 @@ def find_spikes(data, high_percentile=97, low_percentile=3):
     
     return spikes
 
-def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:list=[],   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterList:list=[], intraDayclusterList:list=[], troInterval:list=[], toggle_value:list=[], poly_value:list=[]):
+def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:list=[],   trends:list=[], pea:bool=False,  previousDay:list=[], OptionTimeFrame:list=[], clusterList:list=[], intraDayclusterList:list=[], troInterval:list=[], toggle_value:list=[], poly_value:list=[] , tp100allDay:list=[]):
   
     notround = np.average(df_dx)
     average = round(np.average(df_dx), 3)
@@ -855,14 +932,14 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         fig.add_trace(go.Bar(x=df['time'], y=df['topDiffOverallInCandle'], marker_color=colors), row=2, col=1)
         
 
-    fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines', opacity=0.50, name='P',marker_color='#0000FF')) # #0000FF
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines', opacity=0.50, name='P',marker_color='#0000FF')) # #0000FF
     #fig.add_trace(go.Scatter(x=df['time'], y=df['Smoothed_POC'], mode='lines', opacity=0.50, name='Smoothed_POC',marker_color='black'))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30,name='HighVA',marker_color='rgba(0,0,0)'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['HighVA'], mode='lines', opacity=0.30,name='HighVA',marker_color='rgba(0,0,0)'))
 
-    fig.add_trace(go.Scatter(x=df['time'], y=df['volumePbottom'], mode='lines', name='volumePbottom'))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['volumePtop'], mode='lines', name='volumePtop'))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['volumePmid'], mode='lines', name='volumePmid'))  
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['volumePbottom'], mode='lines', name='volumePbottom'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['volumePtop'], mode='lines', name='volumePtop'))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['volumePmid'], mode='lines', name='volumePmid'))  
     
         #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
@@ -894,7 +971,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.80, name='POC',marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
-      
+        
+    fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][0][0] for i in tp100allDay]), mode='lines',name='tp100allDay-0')) 
+    fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][1][0] for i in tp100allDay]), mode='lines',name='tp100allDay-1')) 
+    fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][2][0] for i in tp100allDay]), mode='lines',name='tp100allDay-2')) 
+    fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][3][0] for i in tp100allDay]), mode='lines',name='tp100allDay-3')) 
+    fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][4][0] for i in tp100allDay]), mode='lines',name='tp100allDay-4')) 
     #fig.add_trace(go.Scatter(x=df['time'], y=df['100ema'], mode='lines', opacity=0.3, name='100ema', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['150ema'], mode='lines', opacity=0.3, name='150ema', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['200ema'], mode='lines', opacity=0.3, name='200emaa', line=dict(color='black')))
@@ -1894,7 +1976,51 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                             ),
                   row=1, col=1)
 
-    '''
+    
+    for v in range(len(sortadlist[:10])):
+        #res = [0,0,0]
+        fig.add_trace(go.Scatter(x=df['time'],
+                                 y= [sortadlist[v][0]]*len(df['time']) ,
+                                 line_color= 'rgb(0,104,139)' if (str(sortadlist[v][3]) == 'B(SELL)' or str(sortadlist[v][3]) == 'BB(SELL)' or str(sortadlist[v][3]) == 'B') else 'brown' if (str(sortadlist[v][3]) == 'A(BUY)' or str(sortadlist[v][3]) == 'AA(BUY)' or str(sortadlist[v][3]) == 'A') else 'rgb(0,0,0)',
+                                 text = str(sortadlist[v][4]) + ' ' + str(sortadlist[v][1]) + ' ' + str(sortadlist[v][3])  + ' ' + str(sortadlist[v][6]),
+                                 #text='('+str(priceDict[sortadlist[v][0]]['ASKAVG'])+'/'+str(priceDict[sortadlist[v][0]]['BIDAVG']) +')'+ '('+str(priceDict[sortadlist[v][0]]['ASK'])+'/'+str(priceDict[sortadlist[v][0]]['BID']) +')'+  '('+ sortadlist[v][3] +') '+str(sortadlist[v][4]),
+                                 textposition="bottom left",
+                                 name=str(sortadlist[v][0]),
+                                 showlegend=False,
+                                 #visible=False,
+                                 mode= 'lines',
+                                
+                                ),
+                      row=1, col=1
+                     )
+        
+    for trds in sortadlist[:10]:
+        try:
+            # Extract the timestamp index and the actual price from your tuple
+            idx   = trds[7]
+            price = float(trds[0])   # your “actual price” in element 0
+            
+            # Decide side/text the same way you were doing
+            if str(trds[3]) == 'A':
+                side_label = 'Sell'
+            elif str(trds[3]) == 'B':
+                side_label = 'Buy'
+            else:
+                side_label = 'Mid'
+            
+            # Build your annotation at (time, actual price)
+            fig.add_annotation(
+                x=df['time'].iloc[idx],
+                y=price,
+                text=f"{trds[4]} {trds[1]} {side_label}",
+                showarrow=True,
+                arrowhead=4,
+                font=dict(size=10)
+            )
+        except (KeyError, ValueError, IndexError):
+            continue
+
+    
     fig.add_trace(go.Scatter(x=df['time'], y=df['ema_100'], mode='lines',name='ema_100',line=dict(color='green'))) 
     #mazz = sum(cluster[1] for cluster in cdata) / len(cdata)
     if len(clusterList) > 0:
@@ -1956,6 +2082,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                         showlegend=False,
                         mode='lines'
                     ), row=1, col=1)
+    '''
     
     '''
     sorted_list = sorted(intraDayclusterList, key=len, reverse=True)
@@ -2132,9 +2259,198 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                        font=dict(
                                            size=8,
                                        ),)
+    
+    
+    for i, row in df.iterrows():
+        pat = row['hvapattern']
+        if pat == 'none':
+            continue
+    
+        # pick arrow and color per pattern
+        if pat == 'bounce':
+            y = row['low']   # point arrow at the wick
+            ay = -30         # arrow tail below
+            color = 'green'
+        elif pat == 'rejection':
+            y = row['high']
+            ay = 30          # arrow tail above
+            color = 'orange'
+        elif pat == 'breakout':
+            y = row['high']
+            ay = 30
+            color = 'blue'
+        elif pat == 'breakdown':
+            y = row['low']
+            ay = -30
+            color = 'purple'
+        elif pat == 'false_breakup':
+            y = row['high']
+            ay = 30
+            color = 'red'
+        elif pat == 'false_breakdown':
+            y = row['low']
+            ay = -30
+            color = 'maroon'
+        else:
+            continue
+    
+        fig.add_annotation(
+            x=row['time'],      # or whatever your datetime/index column is
+            y=y,
+            text=f"<b>hva{pat}</b>",
+            showarrow=True,
+            arrowhead=3,
+            ax=0,               # shift arrow tail horizontally (0 = straight up/down)
+            ay=ay,              # shift arrow tail vertically
+            arrowcolor=color,
+            font=dict(color=color, size=10),
+            align="center",
+        )
+        
+    
+    for i, row in df.iterrows():
+        pat = row['lvapattern']
+        if pat == 'none':
+            continue
+    
+        # pick arrow and color per pattern
+        if pat == 'bounce':
+            y = row['low']   # point arrow at the wick
+            ay = -30         # arrow tail below
+            color = 'green'
+        elif pat == 'rejection':
+            y = row['high']
+            ay = 30          # arrow tail above
+            color = 'orange'
+        elif pat == 'breakout':
+            y = row['high']
+            ay = 30
+            color = 'blue'
+        elif pat == 'breakdown':
+            y = row['low']
+            ay = -30
+            color = 'purple'
+        elif pat == 'false_breakup':
+            y = row['high']
+            ay = 30
+            color = 'red'
+        elif pat == 'false_breakdown':
+            y = row['low']
+            ay = -30
+            color = 'maroon'
+        else:
+            continue
+    
+        fig.add_annotation(
+            x=row['time'],      # or whatever your datetime/index column is
+            y=y,
+            text=f"<b>lva{pat}</b>",
+            showarrow=True,
+            arrowhead=3,
+            ax=0,               # shift arrow tail horizontally (0 = straight up/down)
+            ay=ay,              # shift arrow tail vertically
+            arrowcolor=color,
+            font=dict(color=color, size=10),
+            align="center",
+        )
+        
+    
+    for i, row in df.iterrows():
+        pat = row['pattern']
+        if pat == 'none':
+            continue
+    
+        # pick arrow and color per pattern
+        if pat == 'bounce':
+            y = row['low']   # point arrow at the wick
+            ay = -30         # arrow tail below
+            color = 'green'
+        elif pat == 'rejection':
+            y = row['high']
+            ay = 30          # arrow tail above
+            color = 'orange'
+        elif pat == 'breakout':
+            y = row['high']
+            ay = 30
+            color = 'blue'
+        elif pat == 'breakdown':
+            y = row['low']
+            ay = -30
+            color = 'purple'
+        elif pat == 'false_breakup':
+            y = row['high']
+            ay = 30
+            color = 'red'
+        elif pat == 'false_breakdown':
+            y = row['low']
+            ay = -30
+            color = 'maroon'
+        else:
+            continue
+    
+        fig.add_annotation(
+            x=row['time'],      # or whatever your datetime/index column is
+            y=y,
+            text=f"<b>POC{pat}</b>",
+            showarrow=True,
+            arrowhead=3,
+            ax=0,               # shift arrow tail horizontally (0 = straight up/down)
+            ay=ay,              # shift arrow tail vertically
+            arrowcolor=color,
+            font=dict(color=color, size=10),
+            align="center",
+        )
+    
+
+    
+    for nn in ['tp100allDay-0', 'tp100allDay-1', 'tp100allDay-2', 'tp100allDay-3', 'tp100allDay-4']:
+        for i, row in df.iterrows():
+            pat = row[nn+'pattern']
+            if pat == 'none':
+                continue
+        
+            # pick arrow and color per pattern
+            if pat == 'bounce':
+                y = row['low']   # point arrow at the wick
+                ay = -30         # arrow tail below
+                color = 'green'
+            elif pat == 'rejection':
+                y = row['high']
+                ay = 30          # arrow tail above
+                color = 'orange'
+            elif pat == 'breakout':
+                y = row['high']
+                ay = 30
+                color = 'blue'
+            elif pat == 'breakdown':
+                y = row['low']
+                ay = -30
+                color = 'purple'
+            elif pat == 'false_breakup':
+                y = row['high']
+                ay = 30
+                color = 'red'
+            elif pat == 'false_breakdown':
+                y = row['low']
+                ay = -30
+                color = 'maroon'
+            else:
+                continue
+        
+            fig.add_annotation(
+                x=row['time'],      # or whatever your datetime/index column is
+                y=y,
+                text=f"<b>{nn}{pat}</b>",
+                showarrow=True,
+                arrowhead=3,
+                ax=0,               # shift arrow tail horizontally (0 = straight up/down)
+                ay=ay,              # shift arrow tail vertically
+                arrowcolor=color,
+                font=dict(color=color, size=10),
+                align="center",
+            )
+
     '''
-
-
     fig.update_layout(height=890, xaxis_rangeslider_visible=False, showlegend=False, xaxis=dict(showgrid=False))
     fig.update_xaxes(autorange="reversed", row=1, col=2)
     #fig.update_xaxes(autorange="reversed", row=1, col=3)
@@ -2793,6 +3109,505 @@ def find_clusters_1(data, threshold):
     return clusters
 
 
+
+def classify_patterns_pct_v3(
+    df: pd.DataFrame,
+    price_col:  str   = 'smoothed_1ema',
+    poc_col:    str   = 'POC',
+    tol_touch:  float = 0.1,   # percent band around POC to count as “touch”
+    tol_break:  float = 0.0    # percent‐distance for a clean break
+) -> pd.DataFrame:
+    """
+    Adds:
+      • POCDistance     – (price – POC) / POC * 100
+      • bounce          – coming from above, enters ±tol_touch band, then reverses up
+      • rejection       – coming from below, enters ±tol_touch band, then reverses down
+      • breakout        – prev ≤ tol_break, curr > tol_break
+      • breakdown       – prev ≥ -tol_break, curr < -tol_break
+      • pattern         – one of
+          ['bounce','rejection','breakout','breakdown','none']
+    """
+
+    df = df.copy()
+    # 1) % distance from POC
+    df['POCDistance'] = (df[price_col] - df[poc_col]) / df[poc_col] * 100
+    pdist      = df['POCDistance']
+    prev_pdist = pdist.shift(1)
+    next_pdist = pdist.shift(-1)
+
+    # 2) define “near the POC” band
+    near_band = pdist.abs() <= tol_touch
+
+    # 3) compute deltas
+    prev_delta = pdist - prev_pdist    # <0 means moving toward POC from above, >0 means moving toward from below
+    next_delta = next_pdist - pdist    # >0 means reversing up, <0 reversing down
+
+    # 4) Bounce: approaching from above (prev_pdist>0 & prev_delta<0), touches band, then next_delta>0
+    df['bounce'] = (
+        (prev_pdist > 0) &
+        (prev_delta < 0) &
+        near_band &
+        (next_delta > 0)
+    )
+
+    # 5) Rejection: approaching from below (prev_pdist<0 & prev_delta>0), touches band, then next_delta<0
+    df['rejection'] = (
+        (prev_pdist < 0) &
+        (prev_delta > 0) &
+        near_band &
+        (next_delta < 0)
+    )
+
+    # 6) Clean breakout: cross up through tol_break
+    df['breakout'] = (
+        (prev_pdist <= tol_break) &
+        (pdist      >  tol_break)
+    )
+
+    # 7) Clean breakdown: cross down through -tol_break
+    df['breakdown'] = (
+        (prev_pdist >= -tol_break) &
+        (pdist      <  -tol_break)
+    )
+
+    # 8) Combine into one pattern column
+    conds  = [df['bounce'], df['rejection'], df['breakout'], df['breakdown']]
+    names  = ['bounce', 'rejection', 'breakout', 'breakdown']
+    df['pattern'] = np.select(conds, names, default='none')
+
+    return df
+
+def keep_only_valid_pairs(df, pattern_col='pattern'):
+    """
+    From df[pattern_col], only keep
+      - breakdown/rejection pairs
+      -  bounce/breakout pairs
+    in either order, with no other non‐none patterns in between.
+    All other events become 'none'.
+    """
+    df = df.copy()
+    pats = df[pattern_col].values
+    valid = np.array(['none'] * len(pats), dtype=object)
+    
+    # define our two valid groups
+    group_down = {'breakdown', 'rejection'}
+    group_up   = {'bounce',    'breakout'}
+    
+    # helper to scan one group
+    def process_group(group):
+        # indices where pattern is in this group
+        idxs = [i for i,p in enumerate(pats) if p in group]
+        i = 0
+        while i < len(idxs) - 1:
+            a, b = idxs[i], idxs[i+1]
+            # ensure no other non‐none in between
+            if pats[a] in group and pats[b] in group:
+                # check that everything strictly between a and b is 'none'
+                if all(pats[j]=='none' for j in range(a+1, b)):
+                    # this pair is valid
+                    valid[a] = pats[a]
+                    valid[b] = pats[b]
+                    i += 2
+                    continue
+            i += 1
+    
+    # process each group
+    process_group(group_down)
+    process_group(group_up)
+    
+    df[pattern_col] = valid
+    return df
+
+
+
+
+def classify_patterns_hva(
+    df: pd.DataFrame,
+    price_col:  str   = 'smoothed_1ema',
+    poc_col:    str   = 'HighVA',
+    tol_touch:  float = 0.1,   # percent band around POC to count as “touch”
+    tol_break:  float = 0.0    # percent‐distance for a clean break
+) -> pd.DataFrame:
+    """
+    Adds:
+      • POCDistance     – (price – POC) / POC * 100
+      • bounce          – coming from above, enters ±tol_touch band, then reverses up
+      • rejection       – coming from below, enters ±tol_touch band, then reverses down
+      • breakout        – prev ≤ tol_break, curr > tol_break
+      • breakdown       – prev ≥ -tol_break, curr < -tol_break
+      • pattern         – one of
+          ['bounce','rejection','breakout','breakdown','none']
+    """
+
+    df = df.copy()
+    # 1) % distance from POC
+    df[poc_col+'Distance'] = (df[price_col] - df[poc_col]) / df[poc_col] * 100
+    pdist      = df[poc_col+'Distance']
+    prev_pdist = pdist.shift(1)
+    next_pdist = pdist.shift(-1)
+
+    # 2) define “near the POC” band
+    near_band = pdist.abs() <= tol_touch
+
+    # 3) compute deltas
+    prev_delta = pdist - prev_pdist    # <0 means moving toward POC from above, >0 means moving toward from below
+    next_delta = next_pdist - pdist    # >0 means reversing up, <0 reversing down
+
+    # 4) Bounce: approaching from above (prev_pdist>0 & prev_delta<0), touches band, then next_delta>0
+    df['hvabounce'] = (
+        (prev_pdist > 0) &
+        (prev_delta < 0) &
+        near_band &
+        (next_delta > 0)
+    )
+
+    # 5) Rejection: approaching from below (prev_pdist<0 & prev_delta>0), touches band, then next_delta<0
+    df['hvarejection'] = (
+        (prev_pdist < 0) &
+        (prev_delta > 0) &
+        near_band &
+        (next_delta < 0)
+    )
+
+    # 6) Clean breakout: cross up through tol_break
+    df['hvabreakout'] = (
+        (prev_pdist <= tol_break) &
+        (pdist      >  tol_break)
+    )
+
+    # 7) Clean breakdown: cross down through -tol_break
+    df['hvabreakdown'] = (
+        (prev_pdist >= -tol_break) &
+        (pdist      <  -tol_break)
+    )
+
+    # 8) Combine into one pattern column
+    conds  = [df['hvabounce'], df['hvarejection'], df['hvabreakout'], df['hvabreakdown']]
+    names  = ['bounce', 'rejection', 'breakout', 'breakdown']
+    df['hvapattern'] = np.select(conds, names, default='none')
+
+    return df
+
+
+def classify_patterns_lva(
+    df: pd.DataFrame,
+    price_col:  str   = 'smoothed_1ema',
+    poc_col:    str   = 'LowVA',
+    tol_touch:  float = 0.1,   # percent band around POC to count as “touch”
+    tol_break:  float = 0.0    # percent‐distance for a clean break
+) -> pd.DataFrame:
+    """
+    Adds:
+      • POCDistance     – (price – POC) / POC * 100
+      • bounce          – coming from above, enters ±tol_touch band, then reverses up
+      • rejection       – coming from below, enters ±tol_touch band, then reverses down
+      • breakout        – prev ≤ tol_break, curr > tol_break
+      • breakdown       – prev ≥ -tol_break, curr < -tol_break
+      • pattern         – one of
+          ['bounce','rejection','breakout','breakdown','none']
+    """
+
+    df = df.copy()
+    # 1) % distance from POC
+    df[poc_col+'Distance'] = (df[price_col] - df[poc_col]) / df[poc_col] * 100
+    pdist      = df[poc_col+'Distance']
+    prev_pdist = pdist.shift(1)
+    next_pdist = pdist.shift(-1)
+
+    # 2) define “near the POC” band
+    near_band = pdist.abs() <= tol_touch
+
+    # 3) compute deltas
+    prev_delta = pdist - prev_pdist    # <0 means moving toward POC from above, >0 means moving toward from below
+    next_delta = next_pdist - pdist    # >0 means reversing up, <0 reversing down
+
+    # 4) Bounce: approaching from above (prev_pdist>0 & prev_delta<0), touches band, then next_delta>0
+    df['lvabounce'] = (
+        (prev_pdist > 0) &
+        (prev_delta < 0) &
+        near_band &
+        (next_delta > 0)
+    )
+
+    # 5) Rejection: approaching from below (prev_pdist<0 & prev_delta>0), touches band, then next_delta<0
+    df['lvarejection'] = (
+        (prev_pdist < 0) &
+        (prev_delta > 0) &
+        near_band &
+        (next_delta < 0)
+    )
+
+    # 6) Clean breakout: cross up through tol_break
+    df['lvabreakout'] = (
+        (prev_pdist <= tol_break) &
+        (pdist      >  tol_break)
+    )
+
+    # 7) Clean breakdown: cross down through -tol_break
+    df['lvabreakdown'] = (
+        (prev_pdist >= -tol_break) &
+        (pdist      <  -tol_break)
+    )
+
+    # 8) Combine into one pattern column
+    conds  = [df['lvabounce'], df['lvarejection'], df['lvabreakout'], df['lvabreakdown']]
+    names  = ['bounce', 'rejection', 'breakout', 'breakdown']
+    df['lvapattern'] = np.select(conds, names, default='none')
+
+    return df
+
+def classify_patterns(
+    df: pd.DataFrame,
+    price_col:  str   = 'close',
+    poc_col:    str   = '',
+    tol_touch:  float = 0.1,   # percent band around POC to count as “touch”
+    tol_break:  float = 0.0    # percent‐distance for a clean break
+) -> pd.DataFrame:
+    """
+    Adds:
+      • POCDistance     – (price – POC) / POC * 100
+      • bounce          – coming from above, enters ±tol_touch band, then reverses up
+      • rejection       – coming from below, enters ±tol_touch band, then reverses down
+      • breakout        – prev ≤ tol_break, curr > tol_break
+      • breakdown       – prev ≥ -tol_break, curr < -tol_break
+      • pattern         – one of
+          ['bounce','rejection','breakout','breakdown','none']
+    """
+
+    df = df.copy()
+    # 1) % distance from POC
+    df[poc_col+'Distance'] = (df[price_col] - df[poc_col]) / df[poc_col] * 100
+    pdist      = df[poc_col+'Distance']
+    prev_pdist = pdist.shift(1)
+    next_pdist = pdist.shift(-1)
+
+    # 2) define “near the POC” band
+    near_band = pdist.abs() <= tol_touch
+
+    # 3) compute deltas
+    prev_delta = pdist - prev_pdist    # <0 means moving toward POC from above, >0 means moving toward from below
+    next_delta = next_pdist - pdist    # >0 means reversing up, <0 reversing down
+
+    # 4) Bounce: approaching from above (prev_pdist>0 & prev_delta<0), touches band, then next_delta>0
+    df[poc_col+'bounce'] = (
+        (prev_pdist > 0) &
+        (prev_delta < 0) &
+        near_band &
+        (next_delta > 0)
+    )
+
+    # 5) Rejection: approaching from below (prev_pdist<0 & prev_delta>0), touches band, then next_delta<0
+    df[poc_col+'rejection'] = (
+        (prev_pdist < 0) &
+        (prev_delta > 0) &
+        near_band &
+        (next_delta < 0)
+    )
+
+    # 6) Clean breakout: cross up through tol_break
+    df[poc_col+'breakout'] = (
+        (prev_pdist <= tol_break) &
+        (pdist      >  tol_break)
+    )
+
+    # 7) Clean breakdown: cross down through -tol_break
+    df[poc_col+'breakdown'] = (
+        (prev_pdist >= -tol_break) &
+        (pdist      <  -tol_break)
+    )
+
+    # 8) Combine into one pattern column
+    conds  = [df[poc_col+'bounce'], df[poc_col+'rejection'], df[poc_col+'breakout'], df[poc_col+'breakdown']]
+    names  = ['bounce', 'rejection', 'breakout', 'breakdown']
+    df[poc_col+'pattern'] = np.select(conds, names, default='none')
+
+    return df
+
+def classify_patterns_v3(
+    df: pd.DataFrame,
+    price_col: str = 'close',
+    poc_col:   str = '',
+    tol_touch: float = 0.008,   # 0.8% band to count as “touch”
+    tol_break: float = 0.0,     # zero‐line for break crosses
+    min_rev:   float = 0.0005    # require ≥0.5% reversal AFTER the touch
+) -> pd.DataFrame:
+    """
+    Like v2, but for bounce/rejection we also demand that
+    the immediate reversal is at least `min_rev` (e.g. 0.005 = 0.5%).
+    """
+
+    df = df.copy()
+    # compute signed % distance from POC
+    df['pd'] = (df[price_col] - df[poc_col]) / df[poc_col] * 100
+    prev = df['pd'].shift(1).fillna(df['pd'].iloc[0])
+    nxt  = df['pd'].shift(-1).fillna(df['pd'].iloc[-1])
+
+    # track breakout/breakdown state
+    side = (
+        'above' if df['pd'].iloc[0] > tol_break
+        else 'below' if df['pd'].iloc[0] < -tol_break
+        else 'neutral'
+    )
+
+    pats = []
+    for i, p in enumerate(df['pd']):
+        p_prev = prev.iloc[i]
+        p_next = nxt.iloc[i]
+        frac_dist = abs(p) / 100.0      # e.g. pd=0.8% → frac_dist=0.008
+        rev_frac  = (p_next - p) / 100.0  # e.g. if pd goes 0.8→1.4 then rev_frac=0.006
+
+        # bounce
+        if (
+            p_prev >  tol_break and        # came from above
+            frac_dist <= tol_touch and     # got within band
+            rev_frac  >= min_rev           # reversed up by at least min_rev
+        ):
+            pats.append('bounce')
+            continue
+
+        # rejection
+        if (
+            p_prev <  -tol_break and
+            frac_dist <= tol_touch and
+            rev_frac  <= -min_rev          # reversed down by at least min_rev
+        ):
+            pats.append('rejection')
+            continue
+
+        # breakout
+        if p > tol_break and side in ('below','neutral'):
+            pats.append('breakout')
+            side = 'above'
+            continue
+
+        # breakdown
+        if p < -tol_break and side in ('above','neutral'):
+            pats.append('breakdown')
+            side = 'below'
+            continue
+
+        pats.append('none')
+
+    df[poc_col+'pattern'] = pats
+    return df
+
+
+def classify_patterns_rt(
+    df: pd.DataFrame,
+    price_col: str = 'close',
+    poc_col:   str = '',
+    tol_touch: float = 0.008,   # 0.8% “touch” band
+    tol_break: float = 0.0,     # zero‐cross threshold
+    min_rev:   float = 0.0005   # require ≥0.05% reversal vs prior bar
+) -> pd.DataFrame:
+    """
+    Like v3 but only uses prior‐bar data:
+      • bounce    – came from above, entered tol_touch, then closed ≥min_rev back up
+      • rejection – came from below, entered tol_touch, then closed ≥min_rev back down
+      • breakout  – first close crossing above zero
+      • breakdown – first close crossing below zero
+      • none      – otherwise
+    """
+
+    df = df.copy()
+
+    # 1) percent‐distance from level
+    df['pd'] = (df[price_col] - df[poc_col]) / df[poc_col] * 100
+
+    # 2) pd of prior bar
+    prev = df['pd'].shift(1).fillna(df['pd'].iloc[0])
+
+    # 3) track whether we’ve already broken above or below
+    first = df['pd'].iloc[0]
+    if   first >  tol_break:  side = 'above'
+    elif first < -tol_break:  side = 'below'
+    else:                     side = 'neutral'
+
+    pats = []
+    for i, p in enumerate(df['pd']):
+        p_prev    = prev.iloc[i]
+        frac_dist = abs(p) / 100.0            # e.g. 0.8% → 0.008
+        rev_frac  = (p - p_prev) / 100.0      # e.g. closed 1.2%→1.8% → 0.006
+
+        # Bounce?
+        if (
+            p_prev   > tol_break and         # was above yesterday
+            frac_dist <= tol_touch and       # touched the band
+            rev_frac  >= min_rev             # closed up by ≥min_rev
+        ):
+            pats.append('bounce')
+            continue
+
+        # Rejection?
+        if (
+            p_prev   < -tol_break and
+            frac_dist <= tol_touch and
+            rev_frac  <= -min_rev            # closed down by ≥min_rev
+        ):
+            pats.append('rejection')
+            continue
+
+        # Breakout?
+        if p > tol_break and side in ('below','neutral'):
+            pats.append('breakout')
+            side = 'above'
+            continue
+
+        # Breakdown?
+        if p < -tol_break and side in ('above','neutral'):
+            pats.append('breakdown')
+            side = 'below'
+            continue
+
+        pats.append('none')
+
+    df[poc_col + 'pattern'] = pats
+    return df
+
+
+def keep_only_valid_pairs_multi(
+    df: pd.DataFrame,
+    pattern_cols: list[str]
+) -> pd.DataFrame:
+    """
+    For each column name in pattern_cols, only keep
+      – breakdown/rejection pairs
+      – bounce/breakout pairs
+    with no other non-'none' events in between.
+    Everything else becomes 'none'.
+
+    Returns a new DataFrame with each <col> replaced by its pruned version.
+    """
+    df = df.copy()
+    group_down = {'breakdown', 'rejection'}
+    group_up   = {'bounce',    'breakout'}
+
+    for col in pattern_cols:
+        pats = df[col].values
+        valid = np.array(['none'] * len(pats), dtype=object)
+
+        def _prune(group):
+            # find indices in this group
+            idxs = [i for i,p in enumerate(pats) if p in group]
+            i = 0
+            while i < len(idxs) - 1:
+                a, b = idxs[i], idxs[i+1]
+                # check that everything strictly between is 'none'
+                if all(pats[j] == 'none' for j in range(a+1, b)):
+                    valid[a] = pats[a]
+                    valid[b] = pats[b]
+                    i += 2
+                else:
+                    i += 1
+
+        _prune(group_down)
+        _prune(group_up)
+
+        # overwrite with pruned column
+        df[col] = valid
+
+    return df
+
 def midpoint(a, b):
     return (a + b) / 2
 #symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
@@ -3158,6 +3973,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         
         bful = []
         valist = []
+        tp100allDay = []
         for it in range(len(make)):
             if it+1 < len(make):
                 tempList = AllTrades[0:make[it+1][2]]
@@ -3170,7 +3986,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(200)]#tpoNum
             
             
-            
+            tp100allDay.append([make[it][1],nelist[:100]])
             timestamp_s = make[it][0] / 1_000_000_000
             new_timestamp_s = timestamp_s + (int(interv)*60)
             new_timestamp_ns = int(new_timestamp_s * 1_000_000_000)
@@ -3184,7 +4000,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         
         stored_data['tro'] = stored_data['tro'][:len(stored_data['tro'])-1] + dst
         stored_data['pdata'] = stored_data['pdata'][:len(stored_data['pdata'])-1] + valist
-
+        stored_data['tp100allDay'] = stored_data['tp100allDay'][:len(stored_data['tp100allDay'])-1] + tp100allDay
         
         bolist = [0] + [stored_data['tro'][i+1][1] - stored_data['tro'][i][1] for i in range(len(stored_data['tro'])-1)]
         #for i in range(len(stored_data['tro'])-1):
@@ -3340,6 +4156,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         
         bful = []
         valist =[]
+        tp100allDay = []
         for it in range(len(make)):
             if it+1 < len(make):
                 tempList = AllTrades[0:make[it+1][2]]
@@ -3351,6 +4168,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             valist.append(vA  + [df['timestamp'][it], df['time'][it], temphs[2], temphs[0][0][0], temphs[0][len(temphs[0])-1][3], midpoint(temphs[0][0][0], temphs[0][len(temphs[0])-1][3])])
             
             nelist = sorted(tempList, key=lambda d: d[1], reverse=True)[:int(200)]#tpoNum
+            tp100allDay.append([make[it][1],nelist[:100]])
             timestamp_s = make[it][0] / 1_000_000_000
             new_timestamp_s = timestamp_s + (int(interv)*60)
             new_timestamp_ns = int(new_timestamp_s * 1_000_000_000)
@@ -3461,7 +4279,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         top100perCandle_diff = [i[3] for i in top100perCandle]
         df['topDiffOverallInCandle'] = top100perCandle_diff + [np.nan] * (len(df) - len(top100perCandle_diff))
             
-        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist, 'troPerCandle':troPerCandle, 'top100perCandle' : top100perCandle} #'vpShape':vpShape} 
+        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist, 'troPerCandle':troPerCandle, 'top100perCandle' : top100perCandle, 'tp100allDay':tp100allDay} #'vpShape':vpShape} 
         
     
     
@@ -3700,6 +4518,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         
         df['Smoothed_POC'] = df['POC'].ewm(span=8, adjust=False).mean()
         
+        df['ema_50'] = df['close'].ewm(span=100, adjust=False).mean()
+        
         
         #df['buy_signal'] = (df['POCDistanceEMA'].abs() <= 0.021) & (df['smoothed_derivative'] > 0) & ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0))#(df['smoothed_1ema'] >= df['POC']) & (df['POCDistanceEMA'] > 0.048) & (df['smoothed_derivative'] > 0)& ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0)) & (df['vwap_signalBuy'])#0.03 0.0183& (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
         
@@ -3877,9 +4697,84 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             # Update tracking columns
             df.at[p, 'stillbuy'] = stillbuy
             df.at[p, 'stillsell'] = stillsell
+            
+    df['tp100allDay-0'] = pd.Series([i[1][0][0] for i in stored_data['tp100allDay']])
+    df['tp100allDay-1'] = pd.Series([i[1][1][0] for i in stored_data['tp100allDay']])
+    df['tp100allDay-2'] = pd.Series([i[1][2][0] for i in stored_data['tp100allDay']])
+    df['tp100allDay-3'] = pd.Series([i[1][3][0] for i in stored_data['tp100allDay']])
+    df['tp100allDay-4'] = [i[1][4][0] for i in stored_data['tp100allDay']]
     
+    '''
+    df = classify_patterns(df, price_col='close', poc_col='tp100allDay-0', tol_touch=0.001, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='tp100allDay-0pattern')
+    df = classify_patterns(df, price_col='close', poc_col='tp100allDay-1',tol_touch=0.001, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='tp100allDay-1pattern')
+    df = classify_patterns(df, price_col='close', poc_col='tp100allDay-2', tol_touch=0.001, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='tp100allDay-2pattern')
+    df = classify_patterns(df, price_col='close',  poc_col='tp100allDay-3', tol_touch=0.001, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='tp100allDay-3pattern')
+    df = classify_patterns(df, price_col='close', poc_col='tp100allDay-4', tol_touch=0.001, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='tp100allDay-4pattern')
+    
+ 
+     #if stkName == 'NQ' :
+    df = classify_patterns(df, price_col='close', poc_col='STDEV_2', tol_touch=0.0008, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='STDEV_2pattern')
+    df = classify_patterns(df, price_col='close', poc_col='STDEV_25',tol_touch=0.0008, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='STDEV_25pattern')
+    df = classify_patterns(df, price_col='close', poc_col='STDEV_1', tol_touch=0.0008, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='STDEV_1pattern')
+    df = classify_patterns(df, price_col='close',  poc_col='STDEV_15', tol_touch=0.0008, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='STDEV_15pattern')
+    df = classify_patterns(df, price_col='close', poc_col='STDEV_0', tol_touch=0.0008, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='STDEV_0pattern')
+    
+    df = classify_patterns(df, price_col='close', poc_col='STDEV_N2', tol_touch=0.0008, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='STDEV_N2pattern')
+    df = classify_patterns(df, price_col='close', poc_col='STDEV_N25',tol_touch=0.0008, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='STDEV_N25pattern')
+    df = classify_patterns(df, price_col='close', poc_col='STDEV_N1', tol_touch=0.0008, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='STDEV_N1pattern')
+    df = classify_patterns(df, price_col='close',  poc_col='STDEV_N15', tol_touch=0.0008, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='STDEV_N15pattern')
+    df = classify_patterns(df, price_col='close', poc_col='STDEV_N0', tol_touch=0.0008, tol_break=0.0)#, min_rev=0.0003)
+    df = keep_only_valid_pairs(df, pattern_col='STDEV_N0pattern')
 
-
+    pattern_cols = [
+    'POCpattern',
+    'HighVApattern',
+    'LowVApattern',
+    'vwappattern',
+    'volumePmidpattern',
+    'ema_50pattern'
+    ]
+    #df = keep_only_valid_pairs_multi(df, pattern_cols)
+        
+    
+        df = classify_patterns_pct_v3(df, price_col='close', tol_touch=0.0175, tol_break=0.0)
+        df = keep_only_valid_pairs(df)
+        df = classify_patterns_hva(df, price_col='close',tol_touch=0.008, tol_break=0.0)
+        df = keep_only_valid_pairs(df, pattern_col='hvapattern')
+        df = classify_patterns_lva(df,price_col='close', tol_touch=0.008, tol_break=0.0)
+        df = keep_only_valid_pairs(df, pattern_col='lvapattern')
+        df = classify_patterns(df, poc_col='vwap', tol_touch=0.008, tol_break=0.0)
+        df = keep_only_valid_pairs(df, pattern_col='vwappattern')
+        df = classify_patterns(df, poc_col='volumePmid', tol_touch=0.008, tol_break=0.0)
+        df = keep_only_valid_pairs(df, pattern_col='volumePmidpattern')
+        
+        
+    elif stkName == 'ES' or stkName == 'YM':
+        df = classify_patterns_pct_v3(df, price_col='close', tol_touch=0.005, tol_break=0.0)
+        df = keep_only_valid_pairs(df)
+        df = classify_patterns_hva(df, price_col='close',tol_touch=0.0175, tol_break=0.0)
+        df = keep_only_valid_pairs(df, pattern_col='hvapattern')
+        df = classify_patterns_lva(df,price_col='close', tol_touch=0.008, tol_break=0.0)
+        df = keep_only_valid_pairs(df, pattern_col='lvapattern')
+        df = classify_patterns(df, poc_col='vwap', tol_touch=0.008, tol_break=0.0)
+        df = keep_only_valid_pairs(df, pattern_col='vwappattern')
+        df = classify_patterns(df, poc_col='volumePmid', tol_touch=0.005, tol_break=0.0)
+        df = keep_only_valid_pairs(df, pattern_col='volumePmidpattern')
+    '''
     #calculate_ttm_squeeze(df)
     if stkName == 'NQ' or stkName == 'ES' or stkName == 'YM':
         blob = bucket.blob('Daily'+stkName+'topOrders')
@@ -3942,7 +4837,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     #poly_value=[]
     
     
-    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterList=cdata, intraDayclusterList=cdata1, troInterval=stored_data['tro'], toggle_value=toggle_value, poly_value=poly_value ) #trends=FindTrends(df,n=10)
+    fg = plotChart(df, [hs[1],newwT[:int(100)]], va[0], va[1], x_fake, df_dx, troPerCandle=stored_data['troPerCandle'] , stockName=symbolNameList[symbolNumList.index(symbolNum)], previousDay=previousDay, pea=False,  OptionTimeFrame = stored_data['timeFrame'], clusterList=cdata, intraDayclusterList=cdata1, troInterval=stored_data['tro'], toggle_value=toggle_value, poly_value=poly_value, tp100allDay=stored_data['tp100allDay'] ) #trends=FindTrends(df,n=10)
  
     return stored_data, fg, previous_stkName, previous_interv, interval_time
 
@@ -3951,26 +4846,3 @@ if __name__ == '__main__':
     app.run_server(debug=False, host='0.0.0.0', port=8080)
     #app.run_server(debug=False, use_reloader=False)
     
-'''
-hs = historV1(df,int(100),{},AllTrades,[])    
-vppp = []
-cct = 0
-for i in hs[0]:
-    vppp.append([i[0], i[1], cct, i[3]])
-    cct+=1
-    
-    
-result = detect_volume_profile_shape_1(vppp)
-print("Detection Results:")
-print(f"Shape: {result['shape']}")
-print(f"Confidence: {result['confidence']:.3f}")
-print("\nAll Scores:")
-for shape, score in result['all_scores'].items():
-    print(f"  {shape}: {score:.3f}")
-print(f"\nPOC Position: {result['metrics']['poc_position']:.3f}")
-print(f"POC Price: {result['metrics']['poc_price']:.1f}")
-print(f"Asymmetry: {result['metrics']['asymmetry']:.3f}")
-
-# Visualize the result
-visualize_volume_profile(vppp, result)    
-'''
