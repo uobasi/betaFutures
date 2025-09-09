@@ -550,7 +550,7 @@ def valueAreaV3(lst):
     # Identify POC (Point of Control) by maximum volume
     poc_item = max(mkk, key=lambda x: x[1])
     pocIndex = poc_item[2]
-    sPercent = total_volume * 0.90 # 70% of total volume
+    sPercent = total_volume * 0.70 # 70% of total volume
     accumulated_volume = poc_item[1]  # Start with POC volume
 
     # Initialize Value Area boundaries
@@ -966,7 +966,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     
     
     #if 'POC' in df.columns:
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.50,marker_color='#0000FF'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.50,marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.80, name='POC',marker_color='#0000FF'))
@@ -977,6 +977,11 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][2][0] for i in tp100allDay]), mode='lines',name='tp100allDay-2')) 
     fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][3][0] for i in tp100allDay]), mode='lines',name='tp100allDay-3')) 
     fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][4][0] for i in tp100allDay]), mode='lines',name='tp100allDay-4')) 
+    
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['demand_min'], mode='lines',name='demand_min', line=dict(color='teal'))) 
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['demand_max'], mode='lines',name='demand_max', line=dict(color='teal')))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['supply_min'], mode='lines',name='supply_min', line=dict(color='crimson')))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['supply_max'], mode='lines',name='supply_max', line=dict(color='crimson')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['100ema'], mode='lines', opacity=0.3, name='100ema', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['150ema'], mode='lines', opacity=0.3, name='150ema', line=dict(color='black')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['200ema'], mode='lines', opacity=0.3, name='200emaa', line=dict(color='black')))
@@ -1391,7 +1396,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     textposition="bottom left",
                                     name=str(previousDay[2]), #'Prev POC '+ 
                                     showlegend=False,
-                                    visible=False,
+                                    #visible=False,
                                     mode= 'lines',
                                     
                                     ),
@@ -1407,7 +1412,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     textposition="bottom left",
                                     name=str(previousDay[0]),
                                     showlegend=False,
-                                    visible=False,
+                                    #visible=False,
                                     mode= 'lines',
                                     ),
                         )
@@ -1421,7 +1426,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                     textposition="bottom left",
                                     name=str(previousDay[1]),
                                     showlegend=False,
-                                    visible=False,
+                                    #visible=False,
                                     mode= 'lines',
                                     ),
                         )
@@ -1827,9 +1832,25 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topBuys'], marker_color='teal'), row=3, col=1)
         fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topSells'], marker_color='crimson'), row=3, col=1)
         
-        
+    '''   
+    n_bins=10
+    for idx in range(n_bins):
+        y_vals = pd.Series([day[1][idx][0] for day in tp100allDay], index=df.index)
+        fig.add_trace(go.Scatter(
+            x=df['time'],
+            y=y_vals,
+            mode='lines',
+            name=f"tp100allDay-{idx}",
+            # optionally color the first one crimson:
+            line=dict(color='crimson') if idx == 0 else None
+        ))
     
     
+    fig.add_trace(go.Scatter(x=df['time'], y=df['demand_min'], mode='lines',name='demand_min', line=dict(color='teal'))) 
+    fig.add_trace(go.Scatter(x=df['time'], y=df['demand_max'], mode='lines',name='demand_max', line=dict(color='teal')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['supply_min'], mode='lines',name='supply_min', line=dict(color='crimson')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['supply_max'], mode='lines',name='supply_max', line=dict(color='crimson')))
+    '''
     #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[2] for i in OptionTimeFrame]), marker_color='teal'), row=3, col=1)
     #fig.add_trace(go.Bar(x=df['time'], y=pd.Series([i[3] for i in OptionTimeFrame]), marker_color='crimson'), row=3, col=1)
         
@@ -1875,31 +1896,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     '''
     #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[1] for i in troInterval]), line=dict(color='teal'), mode='lines', name='Buy TRO'), row=4, col=1)
     #fig.add_trace(go.Scatter(x=pd.Series([i[0] for i in troInterval]), y=pd.Series([i[3] for i in troInterval]), line=dict(color='crimson'), mode='lines', name='Sell TRO'), row=4, col=1)
-    
-    '''
-    if len(tpCandle) > 0:
-        troRank = []
-        for i in tpCandle:
-            tobuyss =  sum([x[1] for x in [t for t in i[10] if t[3] == 'B']])
-            tosellss = sum([x[1] for x in [t for t in i[10] if t[3] == 'A']])
-            troRank.append([tobuyss+tosellss,i[4]])
-            
-        troRank = sorted(troRank, key=lambda x: x[0], reverse=True)
-        
-        for i in range(len(troRank)):
-            fig.add_annotation(x=df['time'][troRank[i][1]], y=df['high'][troRank[i][1]],
-                                   text='<b>' + '['+str(i)+', '+str(troRank[i][0])+']' + '</b>',
-                                   showarrow=True,
-                                   arrowhead=1,
-                                   font=dict(
-                    #family="Courier New, monospace",
-                    size=10,
-                    # color="#ffffff"
-                ),)
-    '''
-        
-    '''
-    for trds in sortadlist[:1]:
+    ''' 
+    for trds in sortadlist[:5]:
         try:
             if str(trds[3]) == 'A':
                 vallue = 'Sell'
@@ -1921,11 +1919,104 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             ),)
         except(KeyError):
             continue 
+     
+    for v in range(len(sortadlist[:5])):
+        #res = [0,0,0]
+        fig.add_trace(go.Scatter(x=df['time'],
+                                 y= [sortadlist[v][0]]*len(df['time']) ,
+                                 line_color= 'rgb(0,104,139)' if (str(sortadlist[v][3]) == 'B(SELL)' or str(sortadlist[v][3]) == 'BB(SELL)' or str(sortadlist[v][3]) == 'B') else 'brown' if (str(sortadlist[v][3]) == 'A(BUY)' or str(sortadlist[v][3]) == 'AA(BUY)' or str(sortadlist[v][3]) == 'A') else 'rgb(0,0,0)',
+                                 text = str(sortadlist[v][4]) + ' ' + str(sortadlist[v][1]) + ' ' + str(sortadlist[v][3])  + ' ' + str(sortadlist[v][6]),
+                                 #text='('+str(priceDict[sortadlist[v][0]]['ASKAVG'])+'/'+str(priceDict[sortadlist[v][0]]['BIDAVG']) +')'+ '('+str(priceDict[sortadlist[v][0]]['ASK'])+'/'+str(priceDict[sortadlist[v][0]]['BID']) +')'+  '('+ sortadlist[v][3] +') '+str(sortadlist[v][4]),
+                                 textposition="bottom left",
+                                 name=str(sortadlist[v][0]),
+                                 showlegend=False,
+                                 #visible=False,
+                                 mode= 'lines',
+                                
+                                ),
+                      row=1, col=1
+                     )
+    
+    
+    if len(tpCandle) > 0:
+        troRank = []
+        for i in tpCandle:
+            tobuyss =  sum([x[1] for x in [t for t in i[10] if t[3] == 'B']])
+            tosellss = sum([x[1] for x in [t for t in i[10] if t[3] == 'A']])
+            troRank.append([tobuyss+tosellss,i[4]])
+            
+        troRank = sorted(troRank, key=lambda x: x[0], reverse=True)
+        
+        for i in range(len(troRank)):
+            fig.add_annotation(x=df['time'][troRank[i][1]], y=df['high'][troRank[i][1]],
+                                   text='<b>' + '['+str(i)+', '+str(troRank[i][0])+']' + '</b>',
+                                   showarrow=True,
+                                   arrowhead=1,
+                                   font=dict(
+                    #family="Courier New, monospace",
+                    size=10,
+                    # color="#ffffff"
+                ),)
+    
+        
+
+    
+    
+    idx_list = df.index.tolist()                # keep the index as a simple list
+
+    for row_idx, bar in enumerate(idx_list):
+        if row_idx == 0:                        # first bar → no “previous” to compare
+            continue
+    
+        prev_bar = idx_list[row_idx - 1]
+    
+        for i in range(2):
+            col_price = f"tp100allDay-{i}"
+            col_size  = f"tp100allDaySize-{i}"
+            col_side  = f"tp100allDaySide-{i}"
+    
+            # current row values
+            cur_price = df.at[bar,  col_price]
+            cur_size  = df.at[bar,  col_size]
+            cur_side  = str(df.at[bar, col_side])
+    
+            if pd.isna(cur_side) or cur_side.strip() == "":
+                continue                         # nothing recorded in this slot
+    
+            # previous row values
+            prev_price = df.at[prev_bar, col_price]
+            #prev_side  = str(df.at[prev_bar, col_side])
+    
+            # annotate only if side OR price changed vs the previous bar
+            if cur_price == prev_price:
+                continue
+    
+            # decide label & Y-coordinate
+            if cur_side == "A":                  # ask side ⇒ Sell
+                tag  = "Sell"
+                yval = cur_price
+            elif cur_side == "B":                # bid side ⇒ Buy
+                tag  = "Buy"
+                yval = cur_price
+            else:                                # anything else ⇒ Mid
+                tag  = "Mid"
+                yval = df.at[bar, "open"]
+    
+            text = f"{i} {cur_size} {tag} {cur_price}"
+            print(text)
+    
+            fig.add_annotation(
+                x=df.at[bar, "time"],
+                y=yval,
+                text=text,
+                showarrow=True,
+                arrowhead=4,
+                font=dict(size=8),
+                row=1,
+                col=1
+            )
     '''
     
-    
-    for tmr in range(0,len(fig.data)): 
-        fig.data[tmr].visible = True
     '''    
     steps = []
     for i in np.arange(0,len(fig.data)):
@@ -1977,22 +2068,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                   row=1, col=1)
 
     
-    for v in range(len(sortadlist[:10])):
-        #res = [0,0,0]
-        fig.add_trace(go.Scatter(x=df['time'],
-                                 y= [sortadlist[v][0]]*len(df['time']) ,
-                                 line_color= 'rgb(0,104,139)' if (str(sortadlist[v][3]) == 'B(SELL)' or str(sortadlist[v][3]) == 'BB(SELL)' or str(sortadlist[v][3]) == 'B') else 'brown' if (str(sortadlist[v][3]) == 'A(BUY)' or str(sortadlist[v][3]) == 'AA(BUY)' or str(sortadlist[v][3]) == 'A') else 'rgb(0,0,0)',
-                                 text = str(sortadlist[v][4]) + ' ' + str(sortadlist[v][1]) + ' ' + str(sortadlist[v][3])  + ' ' + str(sortadlist[v][6]),
-                                 #text='('+str(priceDict[sortadlist[v][0]]['ASKAVG'])+'/'+str(priceDict[sortadlist[v][0]]['BIDAVG']) +')'+ '('+str(priceDict[sortadlist[v][0]]['ASK'])+'/'+str(priceDict[sortadlist[v][0]]['BID']) +')'+  '('+ sortadlist[v][3] +') '+str(sortadlist[v][4]),
-                                 textposition="bottom left",
-                                 name=str(sortadlist[v][0]),
-                                 showlegend=False,
-                                 #visible=False,
-                                 mode= 'lines',
-                                
-                                ),
-                      row=1, col=1
-                     )
+    
         
     for trds in sortadlist[:10]:
         try:
@@ -2023,6 +2099,12 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     
     fig.add_trace(go.Scatter(x=df['time'], y=df['ema_100'], mode='lines',name='ema_100',line=dict(color='green'))) 
     #mazz = sum(cluster[1] for cluster in cdata) / len(cdata)
+    
+    
+    for t in df.index[df['tp100_4plus_changed']]:
+        #print(t)
+        fig.add_vline(x=t, line_width=1, line_dash="dash", line_color="crimson", row=1, col=1)
+    '''
     if len(clusterList) > 0:
         volumes = [cluster[1] for cluster in clusterList]
         mazz = np.percentile(volumes, 65) 
@@ -2051,7 +2133,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                 )
                 linecolor = f'rgba(220,20,60,{opac})' if askCount > bidCount else (
                             f'rgba(0,139,139,{opac})' if bidCount > askCount else 'gray')
-                if (abs(float(maxNum) - df['1ema'][len(df)-1]) / ((float(maxNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1.25 or (abs(float(minNum) - df['1ema'][len(df)-1]) / ((float(minNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 1.25 : #0.25
+                if (abs(float(maxNum) - df['1ema'][len(df)-1]) / ((float(maxNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.8 or (abs(float(minNum) - df['1ema'][len(df)-1]) / ((float(minNum) + df['1ema'][len(df)-1]) / 2)) * 100 <= 0.8 : #0.25
                     fig.add_shape(
                         type="rect",
                         y0=minNum, y1=maxNum, x0=-1, x1=len(df),
@@ -2082,8 +2164,6 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                         showlegend=False,
                         mode='lines'
                     ), row=1, col=1)
-    '''
-    
     '''
     sorted_list = sorted(intraDayclusterList, key=len, reverse=True)
     for i in sorted_list[:50]:
@@ -2224,6 +2304,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                                         size=12,
                                         color='red'
                                     ),)
+                
+                
     
     
     '''
@@ -3608,6 +3690,54 @@ def keep_only_valid_pairs_multi(
 
     return df
 
+from sklearn.cluster import KMeans
+
+def supply_demand_zones(
+    df: pd.DataFrame,
+    cols: list[str],
+    n_clusters: int = 2,
+    random_state: int = 0
+) -> pd.DataFrame:
+    """
+    For each row in df, cluster the values in `cols` into two clusters
+    and label the lower‐centroid cluster as 'demand' and the higher‐centroid
+    cluster as 'supply'. Returns df with four new columns:
+      • demand_min, demand_max
+      • supply_min, supply_max
+    """
+
+    def _zones_for_row(row: pd.Series):
+        vals = row.values.reshape(-1, 1)
+        # if all values identical, just return flat zones
+        if np.allclose(vals, vals[0]):
+            v = vals[0, 0]
+            return pd.Series({
+                'demand_min': v,
+                'demand_max': v,
+                'supply_min': v,
+                'supply_max': v
+            })
+
+        km = KMeans(n_clusters=n_clusters, random_state=random_state)
+        labels = km.fit_predict(vals)
+        centers = km.cluster_centers_.flatten()
+
+        # lower centroid → demand; higher → supply
+        demand_label, supply_label = np.argsort(centers)
+        demand_vals = vals[labels == demand_label, 0]
+        supply_vals = vals[labels == supply_label, 0]
+
+        return pd.Series({
+            'demand_min': demand_vals.min(),
+            'demand_max': demand_vals.max(),
+            'supply_min': supply_vals.min(),
+            'supply_max': supply_vals.max()
+        })
+
+    # apply row-wise
+    zones = df[cols].apply(_zones_for_row, axis=1)
+    return pd.concat([df, zones], axis=1)
+
 def midpoint(a, b):
     return (a + b) / 2
 #symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
@@ -4521,6 +4651,31 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         df['ema_50'] = df['close'].ewm(span=100, adjust=False).mean()
         
         
+        cpt = 10
+        for i in range(cpt):
+            df[f"tp100allDay-{i}"] = [entry[1][i][0] for entry in stored_data['tp100allDay']]
+            
+        cols = [f"tp100allDay-{i}" for i in range(cpt)]
+
+        #df = supply_demand_zones(df, cols)
+        cols = ["tp100allDay-0","tp100allDay-1","tp100allDay-2","tp100allDay-3","tp100allDay-4"]
+
+        # set a tolerance if you want (0.0 = exact equality for numerics)
+        tol = 0.0
+
+        # True where a cell changed from the previous row (first row = False)
+        changed = df[cols].diff().abs().gt(tol).fillna(False)
+
+        # rows where at least 4 of the 5 columns changed
+        mask = changed.sum(axis=1) >= 3
+
+        # optional: add a flag column (single assignment avoids fragmentation)
+        df["tp100_4plus_changed"] = mask
+
+        # indices (or rows) you care about:
+        #rows_changed_idx = df.index[mask].tolist()
+        #rows_changed_df  = df.loc[mask, cols]
+        
         #df['buy_signal'] = (df['POCDistanceEMA'].abs() <= 0.021) & (df['smoothed_derivative'] > 0) & ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0))#(df['smoothed_1ema'] >= df['POC']) & (df['POCDistanceEMA'] > 0.048) & (df['smoothed_derivative'] > 0)& ((df['polyfit_slope'] > 0) | (df['slope_degrees'] > 0)) & (df['vwap_signalBuy'])#0.03 0.0183& (df['smoothed_derivative'] > 0) & (df['POCDistanceEMA'] > 0.01)#(df['momentum'] > 0) #& (df['1ema'] >= df['vwap']) #& (df['2ema'] >= df['POC'])#(df['derivative_1'] > 0) (df['lsf'] >= df['POC']) #(df['1ema'] > df['POC2']) &  #& (df['holt_winters'] >= df['POC2'])# &  (df['derivative_1'] >= df['kalman_velocity'])# &  (df['derivative_1'] >= df['derivative_2']) )# & (df['1ema'].shift(1) >= df['POC2'].shift(1)) # &  (df['MACD'] > df['Signal'])#(df['1ema'].shift(1) < df['POC2'].shift(1)) & 
         
         # Identify where cross below occurs (previous 3ema is above POC, current 3ema is below)
@@ -4697,7 +4852,17 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             # Update tracking columns
             df.at[p, 'stillbuy'] = stillbuy
             df.at[p, 'stillsell'] = stillsell
-            
+    
+    #cpt = 5
+    #for i in range(cpt):
+        #df[f"tp100allDay-{i}"] = [entry[1][i][0] for entry in stored_data['tp100allDay']]
+        #df[f"tp100allDaySize-{i}"] = [entry[1][i][1] for entry in stored_data['tp100allDay']]
+        #df[f"tp100allDaySide-{i}"] = [entry[1][i][5] for entry in stored_data['tp100allDay']]
+        
+    #cols = [f"tp100allDay-{i}" for i in range(cpt)]
+
+    #df = supply_demand_zones(df, cols)
+    
     df['tp100allDay-0'] = pd.Series([i[1][0][0] for i in stored_data['tp100allDay']])
     df['tp100allDay-1'] = pd.Series([i[1][1][0] for i in stored_data['tp100allDay']])
     df['tp100allDay-2'] = pd.Series([i[1][2][0] for i in stored_data['tp100allDay']])
@@ -4705,6 +4870,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     df['tp100allDay-4'] = [i[1][4][0] for i in stored_data['tp100allDay']]
     
     '''
+    
+    
     df = classify_patterns(df, price_col='close', poc_col='tp100allDay-0', tol_touch=0.001, tol_break=0.0)#, min_rev=0.0003)
     df = keep_only_valid_pairs(df, pattern_col='tp100allDay-0pattern')
     df = classify_patterns(df, price_col='close', poc_col='tp100allDay-1',tol_touch=0.001, tol_break=0.0)#, min_rev=0.0003)
@@ -4846,3 +5013,26 @@ if __name__ == '__main__':
     app.run_server(debug=False, host='0.0.0.0', port=8080)
     #app.run_server(debug=False, use_reloader=False)
     
+'''
+hs = historV1(df,int(100),{},AllTrades,[])    
+vppp = []
+cct = 0
+for i in hs[0]:
+    vppp.append([i[0], i[1], cct, i[3]])
+    cct+=1
+    
+    
+result = detect_volume_profile_shape_1(vppp)
+print("Detection Results:")
+print(f"Shape: {result['shape']}")
+print(f"Confidence: {result['confidence']:.3f}")
+print("\nAll Scores:")
+for shape, score in result['all_scores'].items():
+    print(f"  {shape}: {score:.3f}")
+print(f"\nPOC Position: {result['metrics']['poc_position']:.3f}")
+print(f"POC Price: {result['metrics']['poc_price']:.1f}")
+print(f"Asymmetry: {result['metrics']['asymmetry']:.3f}")
+
+# Visualize the result
+visualize_volume_profile(vppp, result)    
+'''
