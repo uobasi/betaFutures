@@ -4538,8 +4538,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         df['POCDistance'] = (df['smoothed_1ema'] - df['POC']) / df['POC'] * 100
         df['POCDistanceEMA'] = df['POCDistance']#((df['1ema'] - df['POC']) / ((df['1ema'] + df['POC']) / 2)) * 100
         df['vwapDistance'] = (df['smoothed_1ema'] - df['vwap']) / df['vwap'] * 100
-        #df['uppervwapDistance'] = (df['smoothed_1ema'] - df['uppervwapAvg']) / df['uppervwapAvg'] * 100
-        #df['lowervwapDistance'] = (df['smoothed_1ema'] - df['lowervwapAvg']) / df['lowervwapAvg'] * 100
+        df['uppervwapDistance'] = (df['smoothed_1ema'] - df['uppervwapAvg']) / df['uppervwapAvg'] * 100
+        df['lowervwapDistance'] = (df['smoothed_1ema'] - df['lowervwapAvg']) / df['lowervwapAvg'] * 100
         #df['vwapAvgDistance'] = (df['smoothed_1ema'] - df['vwapAvg']) / df['vwapAvg'] * 100
         df['LVADistance'] = (df['smoothed_1ema'] - df['LowVA']) / df['LowVA'] * 100
         df['HVADistance'] = (df['smoothed_1ema'] - df['HighVA']) / df['HighVA'] * 100
