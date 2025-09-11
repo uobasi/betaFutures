@@ -4631,11 +4631,11 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         #df['vwap_signalBuy'] = df.apply(vwapDistanceCheckBuy, axis=1)
         #df['vwap_signalSell'] = df.apply(vwapDistanceCheckSell, axis=1)
         
-        #df['uppervwap_signalBuy'] = df.apply(uppervwapDistanceCheckBuy, axis=1)
-        #df['uppervwap_signalSell'] = df.apply(uppervwapDistanceCheckSell, axis=1) 
+        df['uppervwap_signalBuy'] = df.apply(uppervwapDistanceCheckBuy, axis=1)
+        df['uppervwap_signalSell'] = df.apply(uppervwapDistanceCheckSell, axis=1) 
         
-        #df['lowervwap_signalBuy'] = df.apply(lowervwapDistanceCheckBuy, axis=1)
-        #df['lowervwap_signalSell'] = df.apply(lowervwapDistanceCheckSell, axis=1) 
+        df['lowervwap_signalBuy'] = df.apply(lowervwapDistanceCheckBuy, axis=1)
+        df['lowervwap_signalSell'] = df.apply(lowervwapDistanceCheckSell, axis=1) 
         
         #df['vwapAvg_signalBuy'] = df.apply(vwapAvgDistanceCheckBuy, axis=1)
         #df['vwapAvg_signalSell'] = df.apply(vwapAvgDistanceCheckSell, axis=1)  
@@ -4778,8 +4778,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 (df.at[p, 'smoothed_derivative'] < 0) and 
                 ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
                 #(df.at[p, 'vwap_signalSell']) and
-                (df.at[p, 'LVA_signalSell']) and
-                (df.at[p, 'HVA_signalSell']) #and 
+                (df.at[p, 'lowervwap_signalSell']) and
+                (df.at[p, 'uppervwap_signalSell']) #and 
                 #(abs(df.at[p, 'POCDistanceEMA']) < 0.23) 
                 #(df.at[p, 'uppervwap_signalSell']) and
                 #(df.at[p, 'lowervwap_signalSell']) and
@@ -4798,8 +4798,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 (df.at[p, 'smoothed_derivative'] > 0) and 
                 ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
                 #(df.at[p, 'vwap_signalBuy']) and
-                (df.at[p, 'LVA_signalBuy']) and
-                (df.at[p, 'HVA_signalBuy']) #and 
+                (df.at[p, 'uppervwap_signalBuy']) and
+                (df.at[p, 'lowervwap_signalBuy']) #and 
                 #(abs(df.at[p, 'POCDistanceEMA']) < 0.23) 
                 #(df.at[p, 'uppervwap_signalBuy']) and
                 #(df.at[p, 'lowervwap_signalBuy']) and
@@ -4818,8 +4818,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 (df.at[p, 'smoothed_derivative'] > 0) and 
                 ((df.at[p, 'polyfit_slope'] > 0) | (df.at[p, 'slope_degrees'] > 0)) and 
                 #(df.at[p, 'vwap_signalBuy']) and
-                (df.at[p, 'LVA_signalBuy']) and
-                (df.at[p, 'HVA_signalBuy']) #and 
+                (df.at[p, 'uppervwap_signalBuy']) and
+                (df.at[p, 'lowervwap_signalBuy']) #and 
                 #(abs(df.at[p, 'POCDistanceEMA']) < 0.23) 
                 #(df.at[p, 'uppervwap_signalBuy']) and
                 #(df.at[p, 'lowervwap_signalBuy'])and
@@ -4837,8 +4837,8 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
                 (df.at[p, 'smoothed_derivative'] < 0) and 
                 ((df.at[p, 'polyfit_slope'] < 0) | (df.at[p, 'slope_degrees'] < 0)) and 
                 #(df.at[p, 'vwap_signalSell']) and
-                (df.at[p, 'LVA_signalSell']) and
-                (df.at[p, 'HVA_signalSell']) #and 
+                (df.at[p, 'uppervwap_signalSell']) and
+                (df.at[p, 'lowervwap_signalSell']) #and 
                 #(abs(df.at[p, 'POCDistanceEMA']) < 0.23) 
                 #(df.at[p, 'uppervwap_signalSell'])and
                 #(df.at[p, 'lowervwap_signalSell']) and
