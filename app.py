@@ -3756,7 +3756,7 @@ vaildTPO = [str(i) for i in range(1,500)]
 covarianceList = [str(round(i, 2)) for i in [x * 0.01 for x in range(1, 1000)]]
 
 gclient = storage.Client(project="stockapp-401615")
-bucket = gclient.get_bucket("stockapp-storage")
+bucket = gclient.get_bucket("stockapp-storage-east1")
 
 
 from google.api_core.exceptions import NotFound
