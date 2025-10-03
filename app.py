@@ -966,17 +966,17 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     
     
     #if 'POC' in df.columns:
-    fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',opacity=0.50,marker_color='#0000FF'))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines',name='POC',marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2',opacity=0.80,marker_color='black'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'].cumsum() / (df.index + 1), mode='lines', opacity=0.50, name='CUMPOC',marker_color='#0000FF'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC'], mode='lines', opacity=0.80, name='POC',marker_color='#0000FF'))
         #fig.add_trace(go.Scatter(x=df['time'], y=df['LowVA'], mode='lines', opacity=0.30,name='LowVA',marker_color='rgba(0,0,0)'))
         
     fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][0][0] for i in tp100allDay]), mode='lines',name='tp100allDay-0')) 
-    fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][1][0] for i in tp100allDay]), mode='lines',name='tp100allDay-1')) 
-    fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][2][0] for i in tp100allDay]), mode='lines',name='tp100allDay-2')) 
-    fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][3][0] for i in tp100allDay]), mode='lines',name='tp100allDay-3')) 
-    fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][4][0] for i in tp100allDay]), mode='lines',name='tp100allDay-4')) 
+    #fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][1][0] for i in tp100allDay]), mode='lines',name='tp100allDay-1')) 
+    #fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][2][0] for i in tp100allDay]), mode='lines',name='tp100allDay-2')) 
+    #fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][3][0] for i in tp100allDay]), mode='lines',name='tp100allDay-3')) 
+    #fig.add_trace(go.Scatter(x=df['time'], y=pd.Series([i[1][4][0] for i in tp100allDay]), mode='lines',name='tp100allDay-4')) 
     
     #fig.add_trace(go.Scatter(x=df['time'], y=df['demand_min'], mode='lines',name='demand_min', line=dict(color='teal'))) 
     #fig.add_trace(go.Scatter(x=df['time'], y=df['demand_max'], mode='lines',name='demand_max', line=dict(color='teal')))
