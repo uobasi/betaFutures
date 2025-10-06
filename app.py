@@ -911,6 +911,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_hline(y=30, row=2, col=1)
     if 'Poly' in poly_value:
         fig.add_trace(go.Scatter(x=df['time'], y=df['imbalance'], mode='lines',name='imbalance'), row=3, col=1)
+        fig.add_trace(go.Scatter(x=df['time'], y=df['topimbalance'], mode='lines',name='topimbalance'), row=3, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['polyfit_slope'], mode='lines',name='polyfit_slope'), row=3, col=1) 
         #fig.add_trace(go.Scatter(x=df['time'], y=df['slope_degrees'], mode='lines',name='slope_degrees'), row=3, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
@@ -4475,6 +4476,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     
     # Calculate imbalance
     df['imbalance'] = (df['total_buys'] - df['total_sells']) / (df['total_buys'] + df['total_sells'])
+    df['topimbalance'] = (df['topBuys'] - df['topSells']) / (df['topBuys'] + df['topSells'])
     '''
     window = 5  # Rolling window size in minutes
     df['rolling_buys'] = df['total_buys'].rolling(window=window).sum()
