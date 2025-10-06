@@ -910,9 +910,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_hline(y=70, row=2, col=1)
     #fig.add_hline(y=30, row=2, col=1)
     if 'Poly' in poly_value:
-        fig.add_trace(go.Scatter(x=df['time'], y=df['polyfit_slope'], mode='lines',name='polyfit_slope'), row=3, col=1) 
-        fig.add_trace(go.Scatter(x=df['time'], y=df['slope_degrees'], mode='lines',name='slope_degrees'), row=3, col=1)
-        fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
+        fig.add_trace(go.Scatter(x=df['time'], y=df['imbalance'], mode='lines',name='imbalance'), row=3, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['polyfit_slope'], mode='lines',name='polyfit_slope'), row=3, col=1) 
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['slope_degrees'], mode='lines',name='slope_degrees'), row=3, col=1)
+        #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=3, col=1)
         fig.add_hline(y=0, row=3, col=1)
     else:
         #fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Posdiff'], marker_color='teal'), row=3, col=1)
@@ -4468,13 +4469,13 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     except(ValueError):
         previousDay = []
     
-    '''
+    
     df['total_buys'] =  [i[2] for i in stored_data['timeFrame']]
     df['total_sells'] = [i[3] for i in stored_data['timeFrame']]
     
     # Calculate imbalance
     df['imbalance'] = (df['total_buys'] - df['total_sells']) / (df['total_buys'] + df['total_sells'])
-    
+    '''
     window = 5  # Rolling window size in minutes
     df['rolling_buys'] = df['total_buys'].rolling(window=window).sum()
     df['rolling_sells'] = df['total_sells'].rolling(window=window).sum()
