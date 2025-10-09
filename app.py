@@ -4730,7 +4730,14 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         
         cpt = 100
         for i in range(cpt):
-            df[f"tp100allDay-{i}"] = [entry[1][i][0] for entry in stored_data['tp100allDay']]
+            avg = np.nanmean([
+                entry[1][i][0] if len(entry[1]) > i and len(entry[1][i]) > 0 else np.nan
+                for entry in tp100allDay
+            ])
+            df[f"tp100allDay-{i}"] = [
+                entry[1][i][0] if len(entry[1]) > i and len(entry[1][i]) > 0 else avg
+                for entry in tp100allDay
+            ]
             
         cols = [f"tp100allDay-{i}" for i in range(cpt)]
 
