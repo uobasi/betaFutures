@@ -3830,7 +3830,7 @@ from google.api_core.exceptions import NotFound
 #from scipy.signal import filtfilt, butter, lfilter
 from dash import Dash, dcc, html, Input, Output, callback, State
 initial_inter = 2000000  # Initial interval #210000#250000#80001
-subsequent_inter = 80000  # Subsequent interval
+subsequent_inter = 85000  # Subsequent interval
 app = Dash()
 app.title = "EnVisage"
 app.layout = html.Div([
@@ -3961,7 +3961,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         
     clustNum = '20'
         
-    tpoNum = '500'
+    tpoNum = '100'
 
     #curvature = '0.6'
     
