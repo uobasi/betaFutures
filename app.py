@@ -4435,6 +4435,9 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     df['topSells'] = topSells
     df['topDiffNega'] = ((df['topBuys'] - df['topSells']).apply(lambda x: x if x < 0 else np.nan)).abs()
     df['topDiffPost'] = (df['topBuys'] - df['topSells']).apply(lambda x: x if x > 0 else np.nan)
+
+    df['allDiffNega'] = ((df['buys'] - df['sells']).apply(lambda x: x if x < 0 else np.nan)).abs()
+    df['allDiffPost'] = (df['buys'] - df['sells']).apply(lambda x: x if x > 0 else np.nan)
     
     df['percentile_topBuys'] =  [percentileofscore(df['topBuys'][:i+1], df['topBuys'][i], kind='mean') for i in range(len(df))]
     df['percentile_topSells'] =  [percentileofscore(df['topSells'][:i+1], df['topSells'][i], kind='mean') for i in range(len(df))] 
@@ -4442,7 +4445,9 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     df['percentile_Posdiff'] =  [percentileofscore(df['topDiffPost'][:i+1].dropna(), df['topDiffPost'][i], kind='mean') if not np.isnan(df['topDiffPost'][i]) else None for i in range(len(df))]
     df['percentile_Negdiff'] =  [percentileofscore(df['topDiffNega'][:i+1].dropna(), df['topDiffNega'][i], kind='mean') if not np.isnan(df['topDiffNega'][i]) else None for i in range(len(df))]
     
-        
+    df['percentile_allPosdiff'] =  [percentileofscore(df['allDiffPost'][:i+1].dropna(), df['allDiffPost'][i], kind='mean') if not np.isnan(df['allDiffPost'][i]) else None for i in range(len(df))]
+    df['percentile_allNegdiff'] =  [percentileofscore(df['allDiffNega'][:i+1].dropna(), df['allDiffNega'][i], kind='mean') if not np.isnan(df['allDiffNega'][i]) else None for i in range(len(df))]
+               
     #OptionTimeFrame = stored_data['timeFrame']   
     previous_stkName = sname
     previous_interv = interv
