@@ -4436,8 +4436,13 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
     df['topDiffNega'] = ((df['topBuys'] - df['topSells']).apply(lambda x: x if x < 0 else np.nan)).abs()
     df['topDiffPost'] = (df['topBuys'] - df['topSells']).apply(lambda x: x if x > 0 else np.nan)
 
-    df['allDiffNega'] = ((df['buys'] - df['sells']).apply(lambda x: x if x < 0 else np.nan)).abs()
-    df['allDiffPost'] = (df['buys'] - df['sells']).apply(lambda x: x if x > 0 else np.nan)
+    
+
+    df['total_buys'] =  [i[2] for i in stored_data['timeFrame']]
+    df['total_sells'] = [i[3] for i in stored_data['timeFrame']]
+
+    df['allDiffNega'] = ((df['total_buys'] - df['total_sells']).apply(lambda x: x if x < 0 else np.nan)).abs()
+    df['allDiffPost'] = (df['total_buys'] - df['total_sells']).apply(lambda x: x if x > 0 else np.nan)
     
     df['percentile_topBuys'] =  [percentileofscore(df['topBuys'][:i+1], df['topBuys'][i], kind='mean') for i in range(len(df))]
     df['percentile_topSells'] =  [percentileofscore(df['topSells'][:i+1], df['topSells'][i], kind='mean') for i in range(len(df))] 
@@ -4480,8 +4485,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         previousDay = []
     
     
-    df['total_buys'] =  [i[2] for i in stored_data['timeFrame']]
-    df['total_sells'] = [i[3] for i in stored_data['timeFrame']]
+    
     
     # Calculate imbalance
     df['imbalance'] = (df['total_buys'] - df['total_sells']) / (df['total_buys'] + df['total_sells'])
