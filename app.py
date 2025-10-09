@@ -920,6 +920,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         #fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Posdiff'], marker_color='teal'), row=3, col=1)
         #fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Negdiff'], marker_color='crimson'), row=3, col=1)
         #fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Negdiff'], marker_color='crimson'), row=3, col=1)
+        '''
         colors = ['maroon']
         for val in range(1,len(df['topDiffOverallInCandle'])):
             if df['topDiffOverallInCandle'][val] > 0:
@@ -932,7 +933,9 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
                     color='crimson' 
             colors.append(color)
         fig.add_trace(go.Bar(x=df['time'], y=df['topDiffOverallInCandle'], marker_color=colors), row=2, col=1)
-        
+        '''
+        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_allPosdiff'], marker_color='teal', name='percentile_allPosdiff'), row=2, col=1)
+        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_allNegdiff'], marker_color='crimson', name='percentile_allNegdiff'), row=2, col=1)
 
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines', opacity=0.50, name='P',marker_color='#0000FF')) # #0000FF
     #fig.add_trace(go.Scatter(x=df['time'], y=df['Smoothed_POC'], mode='lines', opacity=0.50, name='Smoothed_POC',marker_color='black'))
@@ -1831,9 +1834,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
         fig.add_trace(go.Bar(x=df['time'], y=df['POCDistanceEMA'], marker_color=colors), row=2, col=1)
      
     else:
-        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topBuys'], marker_color='teal'), row=3, col=1)
-        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topSells'], marker_color='crimson'), row=3, col=1)
-        
+        #fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topBuys'], marker_color='teal'), row=3, col=1)
+        #fig.add_trace(go.Bar(x=df['time'], y=df['percentile_topSells'], marker_color='crimson'), row=3, col=1)
+        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Posdiff'], marker_color='teal', name='percentile_Posdiff'), row=3, col=1)
+        fig.add_trace(go.Bar(x=df['time'], y=df['percentile_Negdiff'], marker_color='crimson', name='percentile_Negdiff'), row=3, col=1)
     '''   
     n_bins=10
     for idx in range(n_bins):
