@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Thu Oct  9 05:44:27 2025
+
+@author: uobas
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Mon Jul 14 04:40:36 2025
 
 @author: uobas
@@ -994,6 +1001,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_trace(go.Scatter(x=df['time'], y=df['uppervwapAvg'], mode='lines', opacity=0.30,name='uppervwapAvg', ))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg'], mode='lines',opacity=0.30,name='lowervwapAvg', ))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', opacity=0.30,name='vwapAvg', ))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['demand_min'], mode='lines',name='demand_min', line=dict(color='teal'))) 
+    fig.add_trace(go.Scatter(x=df['time'], y=df['demand_max'], mode='lines',name='demand_max', line=dict(color='teal')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['supply_min'], mode='lines',name='supply_min', line=dict(color='crimson')))
+    fig.add_trace(go.Scatter(x=df['time'], y=df['supply_max'], mode='lines',name='supply_max', line=dict(color='crimson')))
     
     '''
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', opacity=0.1, name='UPPERVWAP2', line=dict(color='black')))
@@ -3744,6 +3755,56 @@ def supply_demand_zones(
     zones = df[cols].apply(_zones_for_row, axis=1)
     return pd.concat([df, zones], axis=1)
 
+from sklearn.cluster import KMeans
+def supply_demand_zones(
+    df: pd.DataFrame,
+    cols: list[str],
+    n_clusters: int = 2,
+    random_state: int = 0
+) -> pd.DataFrame:
+    """
+    For each row in df, cluster the values in `cols` into two clusters
+    and label the lower‐centroid cluster as 'demand' and the higher‐centroid
+    cluster as 'supply'. Returns df with four new columns:
+      • demand_min, demand_max
+      • supply_min, supply_max
+    """
+
+    def _zones_for_row(row: pd.Series):
+        vals = row.values.reshape(-1, 1)
+        # if all values identical, just return flat zones
+        if np.allclose(vals, vals[0]):
+            v = vals[0, 0]
+            return pd.Series({
+                'demand_min': v,
+                'demand_max': v,
+                'supply_min': v,
+                'supply_max': v
+            })
+
+        km = KMeans(n_clusters=n_clusters, random_state=random_state)
+        labels = km.fit_predict(vals)
+        centers = km.cluster_centers_.flatten()
+
+        # lower centroid → demand; higher → supply
+        demand_label, supply_label = np.argsort(centers)
+        demand_vals = vals[labels == demand_label, 0]
+        supply_vals = vals[labels == supply_label, 0]
+
+        return pd.Series({
+            'demand_min': demand_vals.min(),
+            'demand_max': demand_vals.max(),
+            'supply_min': supply_vals.min(),
+            'supply_max': supply_vals.max()
+        })
+
+    # apply row-wise
+    zones = df[cols].apply(_zones_for_row, axis=1)
+    return pd.concat([df, zones], axis=1)
+
+
+
+
 def midpoint(a, b):
     return (a + b) / 2
 #symbolNumList = ['5002', '42288528', '42002868', '37014', '1551','19222', '899', '42001620', '4127884', '5556', '42010915', '148071', '65', '42004880', '42002512']
@@ -4667,26 +4728,26 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         df['ema_50'] = df['close'].ewm(span=100, adjust=False).mean()
         
         
-        cpt = 10
+        cpt = 100
         for i in range(cpt):
             df[f"tp100allDay-{i}"] = [entry[1][i][0] for entry in stored_data['tp100allDay']]
             
         cols = [f"tp100allDay-{i}" for i in range(cpt)]
 
-        #df = supply_demand_zones(df, cols)
-        cols = ["tp100allDay-0","tp100allDay-1","tp100allDay-2","tp100allDay-3","tp100allDay-4"]
+        df = supply_demand_zones(df, cols)
+        #cols = ["tp100allDay-0","tp100allDay-1","tp100allDay-2","tp100allDay-3","tp100allDay-4"]
 
         # set a tolerance if you want (0.0 = exact equality for numerics)
-        tol = 0.0
+        #tol = 0.0
 
         # True where a cell changed from the previous row (first row = False)
-        changed = df[cols].diff().abs().gt(tol).fillna(False)
+        # changed = df[cols].diff().abs().gt(tol).fillna(False)
 
-        # rows where at least 4 of the 5 columns changed
-        mask = changed.sum(axis=1) >= 3
+        # # rows where at least 4 of the 5 columns changed
+        # mask = changed.sum(axis=1) >= 3
 
-        # optional: add a flag column (single assignment avoids fragmentation)
-        df["tp100_4plus_changed"] = mask
+        # # optional: add a flag column (single assignment avoids fragmentation)
+        # df["tp100_4plus_changed"] = mask
 
         # indices (or rows) you care about:
         #rows_changed_idx = df.index[mask].tolist()
