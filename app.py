@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Sun Oct 19 23:28:25 2025
+
+@author: uobas
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Thu Oct  9 20:02:19 2025
 
 @author: uobas
@@ -331,7 +338,7 @@ def historV1(df, num, quodict, trad:list=[], quot:list=[]): #rangt:int=1
         cntt+=1
         
     for i in cptemp:
-        i+=countCandle(trad,[],i[0],i[3],df['name'][0],{})
+        i+=countCandle(trad,[],i[0],i[3],'',{})
 
     for i in range(len(cptemp)):
         cptemp[i] += zipList[i]
@@ -1007,7 +1014,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     
     #fig.add_trace(go.Scatter(x=df['time'], y=df['uppervwapAvg'], mode='lines', opacity=0.30,name='uppervwapAvg', ))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg'], mode='lines',opacity=0.30,name='lowervwapAvg', ))
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', opacity=0.30,name='vwapAvg', ))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', opacity=0.30,name='vwapAvg', ))intraPOC
+    fig.add_trace(go.Scatter(x=df['time'], y=df['intraPOC'], mode='lines', name='intraPOC', ))
     fig.add_trace(go.Scatter(x=df['time'], y=df['demand_min'], mode='lines',name='demand_min', line=dict(color='teal'))) 
     fig.add_trace(go.Scatter(x=df['time'], y=df['demand_max'], mode='lines',name='demand_max', line=dict(color='teal')))
     fig.add_trace(go.Scatter(x=df['time'], y=df['supply_min'], mode='lines',name='supply_min', line=dict(color='crimson')))
@@ -1198,8 +1206,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
            decreasing={'line': {'color': 'gray'}},
            hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' +  '<br>' +i[11]+ 'AllOrders: '+str(i[2]-i[3]) +
                       f"<br>OverallTopOrders in Candle: <br>"
-                      f"Buys : ({df.loc[i[4], 'topOrderOverallBuyInCandle']})<br>"
-                      f"Sells : ({df.loc[i[4],'topOrderOverallSellInCandle']})<br>"
+                      f"Buys : ({df.loc[i[4], 'topOrderOverallBuyInCandle']}) BuyCount : ({df.loc[i[4], 'topOrderOverallBuyCount']})<br>"
+                      f"Sells : ({df.loc[i[4],'topOrderOverallSellInCandle']}) SellCount : ({df.loc[i[4], 'topOrderOverallSellCount']})<br>"
                       f"Diff : ({df.loc[i[4],'topDiffOverallInCandle']})<br>" for i in MidCand], #+ i[11] + str(sum([i[10][x][2] for x in i[10]]))
            hoverlabel=dict(
                 bgcolor="gray",
@@ -1220,8 +1228,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             decreasing={'line': {'color': 'teal'}},
             hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' +i[11]+ 'AllOrders: '+str(i[2]-i[3]) + 
                        f"<br>OverallTopOrders in Candle: <br>"
-                       f"Buys : ({df.loc[i[4], 'topOrderOverallBuyInCandle']})<br>"
-                       f"Sells : ({df.loc[i[4],'topOrderOverallSellInCandle']})<br>"
+                       f"Buys : ({df.loc[i[4], 'topOrderOverallBuyInCandle']}) BuyCount : ({df.loc[i[4], 'topOrderOverallBuyCount']})<br>"
+                       f"Sells : ({df.loc[i[4],'topOrderOverallSellInCandle']}) SellCount : ({df.loc[i[4], 'topOrderOverallSellCount']})<br>" 
                        f"Diff : ({df.loc[i[4],'topDiffOverallInCandle']})<br>" for i in putCand], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
             hoverlabel=dict(
                  bgcolor="teal",
@@ -1242,8 +1250,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             decreasing={'line': {'color': 'pink'}},
             hovertext=['('+str(i[2])+')'+str(round(i[6],2))+' '+str('Bid')+' '+'('+str(i[3])+')'+str(round(i[7],2))+' Ask' + '<br>' +i[11]+ 'AllOrders: '+str(i[2]-i[3]) + 
                        f"<br>OverallTopOrders in Candle: <br>"
-                       f"Buys : ({df.loc[i[4], 'topOrderOverallBuyInCandle']})<br>"
-                       f"Sells : ({df.loc[i[4],'topOrderOverallSellInCandle']})<br>"
+                       f"Buys : ({df.loc[i[4], 'topOrderOverallBuyInCandle']}) BuyCount : ({df.loc[i[4], 'topOrderOverallBuyCount']})<br>"
+                       f"Sells : ({df.loc[i[4],'topOrderOverallSellInCandle']}) SellCount : ({df.loc[i[4], 'topOrderOverallSellCount']})<br>"
                        f"Diff : ({df.loc[i[4],'topDiffOverallInCandle']})<br>" for i in callCand], #i[11] + str(sum([i[10][x][2] for x in i[10]]))
             hoverlabel=dict(
                  bgcolor="pink",
@@ -1358,8 +1366,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             decreasing={'line': {'color': 'crimson'}}, 
             hovertext=['('+str(OptionTimeFrame[i[4]][2])+')'+str(round(OptionTimeFrame[i[4]][6],2))+' '+str('Bid')+' '+'('+str(OptionTimeFrame[i[4]][3])+')'+str(round(OptionTimeFrame[i[4]][7],2))+' Ask' + '<br>' +str(OptionTimeFrame[i[4]][11])+ 'AllOrders: '+ str(OptionTimeFrame[i[4]][2]-OptionTimeFrame[i[4]][3])  +
                        f"<br>OverallTopOrders in Candle: <br>"
-                       f"Buys : ({df.loc[i[4], 'topOrderOverallBuyInCandle']})<br>"
-                       f"Sells : ({df.loc[i[4],'topOrderOverallSellInCandle']})<br>"
+                       f"Buys : ({df.loc[i[4], 'topOrderOverallBuyInCandle']}) BuyCount : ({df.loc[i[4], 'topOrderOverallBuyCount']})<br>"
+                       f"Sells : ({df.loc[i[4],'topOrderOverallSellInCandle']}) SellCount : ({df.loc[i[4], 'topOrderOverallSellCount']})<br>"
                        f"Diff : ({df.loc[i[4],'topDiffOverallInCandle']})<br>" for i in callCandImb],
             hoverlabel=dict(
                  bgcolor="crimson",
@@ -1380,8 +1388,8 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
             decreasing={'line': {'color': '#16FF32'}},
             hovertext=['('+str(OptionTimeFrame[i[4]][2])+')'+str(round(OptionTimeFrame[i[4]][6],2))+' '+str('Bid')+' '+'('+str(OptionTimeFrame[i[4]][3])+')'+str(round(OptionTimeFrame[i[4]][7],2))+' Ask' + '<br>' +str(OptionTimeFrame[i[4]][11])+ 'AllOrders: '+ str(OptionTimeFrame[i[4]][2]-OptionTimeFrame[i[4]][3]) +
                        f"<br>OverallTopOrders in Candle: <br>"
-                       f"Buys : ({df.loc[i[4], 'topOrderOverallBuyInCandle']})<br>"
-                       f"Sells : ({df.loc[i[4],'topOrderOverallSellInCandle']})<br>"
+                       f"Buys : ({df.loc[i[4], 'topOrderOverallBuyInCandle']}) BuyCount : ({df.loc[i[4], 'topOrderOverallBuyCount']})<br>"
+                       f"Sells : ({df.loc[i[4],'topOrderOverallSellInCandle']}) SellCount : ({df.loc[i[4], 'topOrderOverallSellCount']})<br>"
                        f"Diff : ({df.loc[i[4],'topDiffOverallInCandle']})<br>" for i in putCandImb], 
             hoverlabel=dict(
                  bgcolor="#2CA02C",
@@ -3810,7 +3818,23 @@ def supply_demand_zones(
     return pd.concat([df, zones], axis=1)
 
 
+def get_2_hour_indexes(df, num):
+    indexes = []
+    two_hours_ns = num * 60 * 60 * 1_000_000_000  # 2 hours in nanoseconds
+    start_time = df['timestamp'].iloc[0]
 
+    for i in range(len(df)):
+        if df['timestamp'].iloc[i] - start_time >= two_hours_ns:
+            indexes.append(i)
+            start_time = df['timestamp'].iloc[i]  # reset reference point
+
+    # Ensure the last index is included if not already captured
+    if indexes and indexes[-1] != df.index[-1]:
+        indexes.append(df.index[-1])
+    elif not indexes:
+        indexes.append(df.index[-1])  # if total time < 2h, return last index
+
+    return indexes
 
 def midpoint(a, b):
     return (a + b) / 2
@@ -4242,77 +4266,92 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         df['vpShapeConfidence'] = pd.Series([i[1] for i in stored_data['vpShape']])
         '''
         
-        all_trades_np = np.array(AllTrades, dtype=object)
-        top100perCandle = []
-        for it in range(1, len(make)):  # Start from 1 to allow it-1 access
-            start_idx = make[0][2]  # Always start from the beginning of the day's trades
-            end_idx = make[it][2]   # Up to current candle
+        # all_trades_np = np.array(AllTrades, dtype=object)
+        # top100perCandle = []
+        # for it in range(1, len(make)):  # Start from 1 to allow it-1 access
+        #     start_idx = make[0][2]  # Always start from the beginning of the day's trades
+        #     end_idx = make[it][2]   # Up to current candle
         
-            # Get trades in the window
-            trades_in_window = all_trades_np[start_idx:end_idx]
+        #     # Get trades in the window
+        #     trades_in_window = all_trades_np[start_idx:end_idx]
         
-            # Get top 200 trades by quantity
-            top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-100:].tolist()
+        #     # Get top 200 trades by quantity
+        #     top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-200:].tolist()
         
-            # Filter trades for the current candle interval
-            lower_bound = make[it - 1][0]
-            upper_bound = make[it][0]
-            filtered_orders = [order for order in top_trades if lower_bound <= order[2] <= upper_bound]
+        #     # Filter trades for the current candle interval
+        #     lower_bound = make[it - 1][0]
+        #     upper_bound = make[it][0]
+        #     filtered_orders = [order for order in top_trades if lower_bound <= order[2] <= upper_bound]
         
-            # Sum order quantities by side
-            side_sums = defaultdict(float)
-            for order in filtered_orders:
-                side = order[5]
-                side_sums[side] += order[1]
+        #     # Sum order quantities by side
+        #     side_sums = defaultdict(float)
+        #     side_counts = defaultdict(int)
+        #     for order in filtered_orders:
+        #         side = order[5]
+        #         side_sums[side] += order[1]
+        #         side_counts[side] += 1
         
-            # Append summary for current candle
-            top100perCandle.append([
-                make[it - 1][1],  # Time label
-                side_sums.get('B', 0),
-                side_sums.get('A', 0),
-                side_sums.get('B', 0) - side_sums.get('A', 0)
-            ])
+        #     # Append summary for current candle
+        #     top100perCandle.append([
+        #         make[it - 1][1],  # Time label
+        #         side_sums.get('B', 0),
+        #         side_sums.get('A', 0),
+        #         side_sums.get('B', 0) - side_sums.get('A', 0),  # Difference
+        #         side_counts.get('B', 0),       # Count of buy trades
+        #         side_counts.get('A', 0)
+                
+        #     ])
             
         
-        final_start = make[-1][0]
-        final_time_label = make[-1][1]
+        # final_start = make[-1][0]
+        # final_time_label = make[-1][1]
         
-        # Use all trades from the beginning of the day
-        trades_in_window = all_trades_np[0:]
-        top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-100:].tolist()
+        # # Use all trades from the beginning of the day
+        # trades_in_window = all_trades_np[0:]
+        # top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-200:].tolist()
         
-        # Only filter for trades **after the final_start**
-        filtered_orders = [order for order in top_trades if order[2] >= final_start]
+        # # Only filter for trades **after the final_start**
+        # filtered_orders = [order for order in top_trades if order[2] >= final_start]
                 
-        '''
-        trades_in_window = all_trades_np[0:]
-        lower_bound = make[it][0]
-        filtered_orders = [order for order in top_trades if order[2] >= lower_bound]
-        '''
-        side_sums = defaultdict(float)
-        for order in filtered_orders:
-            side = order[5]
-            side_sums[side] += order[1]
+        # '''
+        # trades_in_window = all_trades_np[0:]
+        # lower_bound = make[it][0]
+        # filtered_orders = [order for order in top_trades if order[2] >= lower_bound]
+        # '''
+        # side_sums = defaultdict(float)
+        # side_counts = defaultdict(int)
+        # for order in filtered_orders:
+        #     side = order[5]
+        #     side_sums[side] += order[1]
+        #     side_counts[side] += 1
         
     
-        top100perCandle.append([
-            final_time_label,
-            side_sums.get('B', 0),
-            side_sums.get('A', 0),
-            side_sums.get('B', 0) - side_sums.get('A', 0)
-        ])
+        # top100perCandle.append([
+        #     final_time_label,
+        #     side_sums.get('B', 0),
+        #     side_sums.get('A', 0),
+        #     side_sums.get('B', 0) - side_sums.get('A', 0),  # Difference
+        #     side_counts.get('B', 0),       # Count of buy trades
+        #     side_counts.get('A', 0)        # Count of sell trades
+        # ])
         
-        stored_data['top100perCandle'] = stored_data['top100perCandle'][:len(stored_data['top100perCandle'])-1] + top100perCandle
+        # stored_data['top100perCandle'] = stored_data['top100perCandle'][:len(stored_data['top100perCandle'])-1] + top100perCandle
         
         
-        top100perCandle_buy = [i[1] for i in stored_data['top100perCandle']]
-        df['topOrderOverallBuyInCandle'] = top100perCandle_buy + [np.nan] * (len(df) - len(top100perCandle_buy))
+        # top100perCandle_buy = [i[1] for i in stored_data['top100perCandle']]
+        # df['topOrderOverallBuyInCandle'] = top100perCandle_buy + [np.nan] * (len(df) - len(top100perCandle_buy))
         
-        top100perCandle_sell = [i[2] for i in stored_data['top100perCandle']]
-        df['topOrderOverallSellInCandle'] = top100perCandle_sell + [np.nan] * (len(df) - len(top100perCandle_sell))
+        # top100perCandle_buycount = [i[4] for i in stored_data['top100perCandle']]
+        # df['topOrderOverallBuyCount'] = top100perCandle_buycount + [np.nan] * (len(df) - len(top100perCandle_buycount))
         
-        top100perCandle_diff = [i[3] for i in stored_data['top100perCandle']]
-        df['topDiffOverallInCandle'] = top100perCandle_diff + [np.nan] * (len(df) - len(top100perCandle_diff))
+        # top100perCandle_sell = [i[2] for i in stored_data['top100perCandle']]
+        # df['topOrderOverallSellInCandle'] = top100perCandle_sell + [np.nan] * (len(df) - len(top100perCandle_sell))
+        
+        # top100perCandle_sellcount = [i[5] for i in stored_data['top100perCandle']]
+        # df['topOrderOverallSellCount'] = top100perCandle_sellcount + [np.nan] * (len(df) - len(top100perCandle_sellcount))
+        
+        # top100perCandle_diff = [i[3] for i in stored_data['top100perCandle']]
+        # df['topDiffOverallInCandle'] = top100perCandle_diff + [np.nan] * (len(df) - len(top100perCandle_diff))
     
     
     if stored_data is None:
@@ -4413,77 +4452,9 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         df['vpShapeConfidence'] = pd.Series([i[1] for i in vpShape])
         '''
             
-        all_trades_np = np.array(AllTrades, dtype=object)
-        top100perCandle = []
-        for it in range(1, len(make)):  # Start from 1 to allow it-1 access
-            start_idx = make[0][2]  # Always start from the beginning of the day's trades
-            end_idx = make[it][2]   # Up to current candle
         
-            # Get trades in the window
-            trades_in_window = all_trades_np[start_idx:end_idx]
-        
-            # Get top 200 trades by quantity
-            top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-200:].tolist()
-        
-            # Filter trades for the current candle interval
-            lower_bound = make[it - 1][0]
-            upper_bound = make[it][0]
-            filtered_orders = [order for order in top_trades if lower_bound <= order[2] <= upper_bound]
-        
-            # Sum order quantities by side
-            side_sums = defaultdict(float)
-            for order in filtered_orders:
-                side = order[5]
-                side_sums[side] += order[1]
-        
-            # Append summary for current candle
-            top100perCandle.append([
-                make[it - 1][1],  # Time label
-                side_sums.get('B', 0),
-                side_sums.get('A', 0),
-                side_sums.get('B', 0) - side_sums.get('A', 0)
-            ])
             
-        
-        final_start = make[-1][0]
-        final_time_label = make[-1][1]
-        
-        # Use all trades from the beginning of the day
-        trades_in_window = all_trades_np[0:]
-        top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-200:].tolist()
-        
-        # Only filter for trades **after the final_start**
-        filtered_orders = [order for order in top_trades if order[2] >= final_start]
-                
-        '''
-        trades_in_window = all_trades_np[0:]
-        lower_bound = make[it][0]
-        filtered_orders = [order for order in top_trades if order[2] >= lower_bound]
-        '''
-        side_sums = defaultdict(float)
-        for order in filtered_orders:
-            side = order[5]
-            side_sums[side] += order[1]
-        
-    
-        top100perCandle.append([
-            final_time_label,
-            side_sums.get('B', 0),
-            side_sums.get('A', 0),
-            side_sums.get('B', 0) - side_sums.get('A', 0)
-        ])
-        
-        
-        top100perCandle_buy = [i[1] for i in top100perCandle]
-        df['topOrderOverallBuyInCandle'] = top100perCandle_buy + [np.nan] * (len(df) - len(top100perCandle_buy))
-        
-        top100perCandle_sell = [i[2] for i in top100perCandle]
-        df['topOrderOverallSellInCandle'] = top100perCandle_sell + [np.nan] * (len(df) - len(top100perCandle_sell))
-        
-        top100perCandle_diff = [i[3] for i in top100perCandle]
-        df['topDiffOverallInCandle'] = top100perCandle_diff + [np.nan] * (len(df) - len(top100perCandle_diff))
-            
-        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist, 'troPerCandle':troPerCandle, 'top100perCandle' : top100perCandle, 'tp100allDay':tp100allDay} #'vpShape':vpShape} 
+        stored_data = {'timeFrame': timeFrame, 'tro':dst, 'pdata':valist, 'troPerCandle':troPerCandle,  'tp100allDay':tp100allDay} #'vpShape':vpShape 'top100perCandle' : top100perCandle,} 
         
     
     
@@ -4749,6 +4720,138 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         cols = [f"tp100allDay-{i}" for i in range(cpt)]
 
         df = supply_demand_zones(df, cols)
+        
+        timeDict = {}
+        make2 = []
+        for ttm in range(len(dtimeEpoch)):
+            
+            make2.append([dtimeEpoch[ttm],dtime[ttm],bisect.bisect_left(tradeEpoch, dtimeEpoch[ttm])]) #min(range(len(tradeEpoch)), key=lambda i: abs(tradeEpoch[i] - dtimeEpoch[ttm]))
+            timeDict[dtime[ttm]] = [0,0,0]
+            
+            
+        indexes_every_2h = get_2_hour_indexes(df, 4)
+        intravalist = []
+        scnt = 0
+
+        for ieth in indexes_every_2h:
+            match_found = False
+
+            for it in range(scnt, len(make2)):
+                if df['timestamp'].iloc[ieth] == make2[it][0] or df['time'].iloc[ieth] == make2[it][1]:
+                    # Found new match, update scnt and do NOT append here
+                    scnt = it
+                    match_found = True
+                    break  # Found a new 2h marker — we wait for the next iteration to collect
+            
+                if not match_found:
+                    # No match found, use scnt to slice and append
+                    if scnt + 1 < len(make2):
+                        tempList = AllTrades[make2[scnt][2]:make2[it + 1][2]]
+                    else:
+                        tempList = AllTrades[make2[scnt][2]:]
+                    
+                    #intravalist.append(tempList) # only break this inner loop; next ieth will continue from scnt
+                
+                    intratemphs = historV1(df[:it+1],100,{}, tempList, [])
+                    vA = valueAreaV3(intratemphs[0])
+                    intravalist.append(vA  + [df['timestamp'][it], df['time'][it], intratemphs[2]]) #intratemphs[0][0][0], intratemphs[0][len(intratemphs[0])-1][3], midpoint(intratemphs[0][0][0], temphs[0][len(intratemphs[0])-1][3])
+
+        last_it = len(make2) - 1
+        if scnt <= last_it:
+            # tempList = AllTrades[make2[scnt][2]:]
+            # intratemphs = historV1(df[last_it:], 100, {}, tempList, [])
+            # vA = valueAreaV3(intratemphs[0])
+            intravalist.append(
+                vA + [df['timestamp'].iloc[-1], df['time'].iloc[-1], intravalist[-1][5]] #intratemphs[2]
+            )       
+        df['intraPOC'] = [i[5] for i in intravalist]
+        df['intraLVA'] = [i[0] for i in intravalist]
+        df['intraHVA'] = [i[1] for i in intravalist] 
+        
+        
+        all_trades_np = np.array(AllTrades, dtype=object)
+        top100perCandle = []
+        for it in range(1, len(make2)):  # Start from 1 to allow it-1 access
+            start_idx = make2[0][2]  # Always start from the beginning of the day's trades
+            end_idx = make2[it][2]   # Up to current candle
+        
+            # Get trades in the window
+            trades_in_window = all_trades_np[start_idx:end_idx]
+        
+            # Get top 200 trades by quantity
+            top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-200:].tolist()
+        
+            # Filter trades for the current candle interval
+            lower_bound = make2[it - 1][0]
+            upper_bound = make2[it][0]
+            filtered_orders = [order for order in top_trades if lower_bound <= order[2] <= upper_bound]
+        
+            # Sum order quantities by side
+            side_sums = defaultdict(float)
+            side_counts = defaultdict(int)
+            for order in filtered_orders:
+                side = order[5]
+                side_sums[side] += order[1]
+                side_counts[side] += 1
+        
+            # Append summary for current candle
+            top100perCandle.append([
+                make2[it - 1][1],  # Time label
+                side_sums.get('B', 0),
+                side_sums.get('A', 0),
+                side_sums.get('B', 0) - side_sums.get('A', 0),  # Difference
+                side_counts.get('B', 0),       # Count of buy trades
+                side_counts.get('A', 0)
+            ])
+            
+        
+        final_start = make2[-1][0]
+        final_time_label = make2[-1][1]
+        
+        # Use all trades from the beginning of the day
+        trades_in_window = all_trades_np[0:]
+        top_trades = trades_in_window[np.argsort(trades_in_window[:, 1].astype(int))][-200:].tolist()
+        
+        # Only filter for trades **after the final_start**
+        filtered_orders = [order for order in top_trades if order[2] >= final_start]
+                
+        '''
+        trades_in_window = all_trades_np[0:]
+        lower_bound = make[it][0]
+        filtered_orders = [order for order in top_trades if order[2] >= lower_bound]
+        '''
+        side_sums = defaultdict(float)
+        side_counts = defaultdict(int)
+        for order in filtered_orders:
+            side = order[5]
+            side_sums[side] += order[1]
+            side_counts[side] += 1
+        
+    
+        top100perCandle.append([
+            final_time_label,
+            side_sums.get('B', 0),
+            side_sums.get('A', 0),
+            side_sums.get('B', 0) - side_sums.get('A', 0),  # Difference
+            side_counts.get('B', 0),       # Count of buy trades
+            side_counts.get('A', 0) 
+        ])
+        
+        
+        top100perCandle_buy = [i[1] for i in top100perCandle]
+        df['topOrderOverallBuyInCandle'] = top100perCandle_buy + [np.nan] * (len(df) - len(top100perCandle_buy))
+        
+        top100perCandle_buycount = [i[4] for i in top100perCandle]
+        df['topOrderOverallBuyCount'] = top100perCandle_buycount + [np.nan] * (len(df) - len(top100perCandle_buycount))
+        
+        top100perCandle_sell = [i[2] for i in top100perCandle]
+        df['topOrderOverallSellInCandle'] = top100perCandle_sell + [np.nan] * (len(df) - len(top100perCandle_sell))
+        
+        top100perCandle_sellcount = [i[5] for i in top100perCandle]
+        df['topOrderOverallSellCount'] = top100perCandle_sellcount + [np.nan] * (len(df) - len(top100perCandle_sellcount))
+        
+        top100perCandle_diff = [i[3] for i in top100perCandle]
+        df['topDiffOverallInCandle'] = top100perCandle_diff + [np.nan] * (len(df) - len(top100perCandle_diff))
         #cols = ["tp100allDay-0","tp100allDay-1","tp100allDay-2","tp100allDay-3","tp100allDay-4"]
 
         # set a tolerance if you want (0.0 = exact equality for numerics)
