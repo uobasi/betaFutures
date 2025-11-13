@@ -1016,10 +1016,10 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg'], mode='lines',opacity=0.30,name='lowervwapAvg', ))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', opacity=0.30,name='vwapAvg', ))intraPOC
     fig.add_trace(go.Scatter(x=df['time'], y=df['intraPOC'], mode='lines', name='intraPOC', ))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['demand_min'], mode='lines',name='demand_min', line=dict(color='teal'))) 
-    fig.add_trace(go.Scatter(x=df['time'], y=df['demand_max'], mode='lines',name='demand_max', line=dict(color='teal')))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['supply_min'], mode='lines',name='supply_min', line=dict(color='crimson')))
-    fig.add_trace(go.Scatter(x=df['time'], y=df['supply_max'], mode='lines',name='supply_max', line=dict(color='crimson')))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['demand_min'], mode='lines',name='demand_min', line=dict(color='teal'))) 
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['demand_max'], mode='lines',name='demand_max', line=dict(color='teal')))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['supply_min'], mode='lines',name='supply_min', line=dict(color='crimson')))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['supply_max'], mode='lines',name='supply_max', line=dict(color='crimson')))
     
     '''
     fig.add_trace(go.Scatter(x=df['time'], y=df['STDEV_2'], mode='lines', opacity=0.1, name='UPPERVWAP2', line=dict(color='black')))
@@ -4719,7 +4719,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             
         cols = [f"tp100allDay-{i}" for i in range(cpt)]
 
-        df = supply_demand_zones(df, cols)
+        #df = supply_demand_zones(df, cols)
         
         timeDict = {}
         make2 = []
