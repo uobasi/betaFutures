@@ -985,7 +985,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
 
     #fig.add_hline(y=0, row=3, col=1)
 
-    fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP',opacity=0.50, line=dict(color='crimson')))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['vwap'], mode='lines', name='VWAP',opacity=0.50, line=dict(color='crimson')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['9ema'], mode='lines',name='9ema'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['20ema'], mode='lines',name='20ema'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['POC2'], mode='lines',name='POC2'))
@@ -1015,7 +1015,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
     #fig.add_trace(go.Scatter(x=df['time'], y=df['uppervwapAvg'], mode='lines', opacity=0.30,name='uppervwapAvg', ))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['lowervwapAvg'], mode='lines',opacity=0.30,name='lowervwapAvg', ))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['vwapAvg'], mode='lines', opacity=0.30,name='vwapAvg', ))intraPOC
-    fig.add_trace(go.Scatter(x=df['time'], y=df['intraPOC'], mode='lines', name='intraPOC', ))
+    #fig.add_trace(go.Scatter(x=df['time'], y=df['intraPOC'], mode='lines', name='intraPOC', ))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['demand_min'], mode='lines',name='demand_min', line=dict(color='teal'))) 
     #fig.add_trace(go.Scatter(x=df['time'], y=df['demand_max'], mode='lines',name='demand_max', line=dict(color='teal')))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['supply_min'], mode='lines',name='supply_min', line=dict(color='crimson')))
@@ -4728,7 +4728,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
             make2.append([dtimeEpoch[ttm],dtime[ttm],bisect.bisect_left(tradeEpoch, dtimeEpoch[ttm])]) #min(range(len(tradeEpoch)), key=lambda i: abs(tradeEpoch[i] - dtimeEpoch[ttm]))
             timeDict[dtime[ttm]] = [0,0,0]
             
-            
+        '''   
         indexes_every_2h = get_2_hour_indexes(df, 4)
         intravalist = []
         scnt = 0
@@ -4767,7 +4767,7 @@ def update_graph_live(n_intervals, toggle_value, poly_value, sname, interv, stor
         df['intraPOC'] = [i[5] for i in intravalist]
         df['intraLVA'] = [i[0] for i in intravalist]
         df['intraHVA'] = [i[1] for i in intravalist] 
-        
+        '''
         
         all_trades_np = np.array(AllTrades, dtype=object)
         top100perCandle = []
