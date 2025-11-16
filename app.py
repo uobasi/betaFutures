@@ -965,7 +965,7 @@ def plotChart(df, lst2, num1, num2, x_fake, df_dx,  stockName='', troPerCandle:l
 
     #fig.add_trace(go.Scatter(x=df['time'], y=df['volumePbottom'], mode='lines', name='volumePbottom'))
     #fig.add_trace(go.Scatter(x=df['time'], y=df['volumePtop'], mode='lines', name='volumePtop'))
-    #fig.add_trace(go.Scatter(x=df['time'], y=df['volumePmid'], mode='lines', name='volumePmid'))  
+    fig.add_trace(go.Scatter(x=df['time'], y=df['volumePmid'], mode='lines', name='volumePmid'))  
     
         #fig.add_trace(go.Scatter(x=df['time'], y=df['smoothed_derivative'], mode='lines',name='smoothed_derivative'), row=2, col=1)
         #fig.add_trace(go.Scatter(x=df['time'], y=df['filtfilt'], mode='lines',name='filtfilt'), row=2, col=1) 
